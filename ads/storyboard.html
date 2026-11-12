@@ -1,0 +1,321 @@
+<title>佐藤さんの、二度目の入社式</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Zen+Kaku+Gothic+New:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: storyboard sheet — spec header, 60s color-temperature strip, then one row per cut (9:16 frame left, direction notes right). Footage frames shift cool → warm. */
+:root {
+  --bg: #eef1f4;
+  --sheet: #ffffff;
+  --fg: #1b232c;
+  --muted: #5d6874;
+  --line: #d3d9e0;
+  --accent: #d9821e;      /* spark amber */
+  --accent-ink: #a65c08;
+  --night: #1f2c3a;       /* cool footage */
+  --dusk: #4a4250;
+  --warm: #8a4f22;        /* warm footage */
+  --f-display: "Dela Gothic One", "Zen Kaku Gothic New", "Hiragino Sans", sans-serif;
+  --f-body: "Zen Kaku Gothic New", "Hiragino Sans", "Noto Sans JP", "Yu Gothic", sans-serif;
+  --f-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #12171d; --sheet: #1a2129; --fg: #e6ebf0; --muted: #9aa5b1; --line: #2d3742;
+    --accent: #f0a04a; --accent-ink: #f5b56b; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #12171d; --sheet: #1a2129; --fg: #e6ebf0; --muted: #9aa5b1; --line: #2d3742;
+  --accent: #f0a04a; --accent-ink: #f5b56b; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body {
+  background: var(--bg); color: var(--fg); font-family: var(--f-body);
+  font-size: 15px; line-height: 1.7;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 32px 64px;
+}
+.wrap { max-width: 1040px; margin: 0 auto; display: grid; gap: 28px; }
+header { display: grid; gap: 10px; }
+.eyebrow { font-family: var(--f-mono); font-size: 12px; letter-spacing: .12em; color: var(--accent-ink); text-transform: uppercase; }
+h1 { font-family: var(--f-display); font-weight: 400; font-size: clamp(28px, 5vw, 44px); line-height: 1.25; margin: 0; text-wrap: balance; }
+.lead { color: var(--muted); margin: 0; max-width: 40em; }
+.specs { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }
+.specs div { background: var(--sheet); padding: 12px 14px; min-width: 0; }
+.specs dt { font-size: 11px; letter-spacing: .1em; color: var(--muted); font-family: var(--f-mono); }
+.specs dd { margin: 2px 0 0; font-weight: 500; }
+h2 { font-family: var(--f-display); font-weight: 400; font-size: 22px; margin: 0; }
+section { display: grid; gap: 14px; }
+.strip-wrap { overflow-x: auto; }
+.strip { display: flex; height: 44px; border-radius: 4px; overflow: hidden; min-width: 560px; }
+.strip a { display: flex; align-items: flex-end; padding: 4px 6px; color: #fff; text-decoration: none; font-family: var(--f-mono); font-size: 11px; border-right: 1px solid rgba(255,255,255,.25); }
+.strip a:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+.strip-legend { display: flex; justify-content: space-between; font-family: var(--f-mono); font-size: 11px; color: var(--muted); min-width: 560px; }
+.note { font-size: 13px; color: var(--muted); margin: 0; }
+
+.cuts { display: grid; gap: 18px; }
+.cut { display: grid; grid-template-columns: 190px 1fr; gap: 22px; background: var(--sheet); border: 1px solid var(--line); border-radius: 8px; padding: 18px; scroll-margin-top: 16px; }
+.frame { position: relative; width: 100%; max-width: 190px; aspect-ratio: 9 / 16; border-radius: 6px; overflow: hidden; }
+.frame svg { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.telop { position: absolute; left: 8%; right: 16%; top: 58%; color: #fff; font-weight: 700; font-size: 12px; line-height: 1.45; text-shadow: 0 1px 3px rgba(0,0,0,.8); text-align: center; text-wrap: balance; }
+.tc { position: absolute; left: 6px; top: 6px; font-family: var(--f-mono); font-size: 10px; color: rgba(255,255,255,.85); background: rgba(0,0,0,.35); padding: 1px 5px; border-radius: 3px; }
+.body { display: grid; gap: 10px; min-width: 0; align-content: start; }
+.head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 14px; }
+.num { font-family: var(--f-display); font-size: 26px; line-height: 1; color: var(--accent-ink); }
+.title { font-weight: 700; font-size: 17px; }
+.time { font-family: var(--f-mono); font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { font-size: 12px; border: 1px solid var(--line); padding: 1px 8px; border-radius: 99px; color: var(--muted); }
+dl.rows { display: grid; grid-template-columns: 6.5em 1fr; gap: 6px 12px; margin: 0; }
+dl.rows dt { font-size: 12px; color: var(--muted); padding-top: 2px; }
+dl.rows dd { margin: 0; min-width: 0; }
+.say { font-weight: 700; }
+.memo { background: color-mix(in srgb, var(--accent) 10%, transparent); border-left: 3px solid var(--accent); padding: 8px 12px; font-size: 13.5px; border-radius: 0 4px 4px 0; }
+
+table { border-collapse: collapse; width: 100%; min-width: 560px; background: var(--sheet); }
+.tbl { overflow-x: auto; border: 1px solid var(--line); border-radius: 6px; }
+th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line); vertical-align: top; font-size: 14px; }
+th { font-size: 12px; color: var(--muted); font-weight: 500; }
+td.mono { font-family: var(--f-mono); font-size: 12px; white-space: nowrap; font-variant-numeric: tabular-nums; }
+tr:last-child td { border-bottom: 0; }
+.grid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 14px; }
+.box { background: var(--sheet); border: 1px solid var(--line); border-radius: 8px; padding: 16px 18px; min-width: 0; }
+.box h3 { margin: 0 0 6px; font-size: 15px; }
+.box ul { margin: 0; padding-left: 1.2em; }
+.box li + li { margin-top: 4px; }
+
+@media (max-width: 640px) {
+  .cut { grid-template-columns: 1fr; }
+  .frame { max-width: 220px; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .cut:target { animation: hl 1.4s ease-out; }
+  @keyframes hl { from { box-shadow: 0 0 0 3px var(--accent); } to { box-shadow: 0 0 0 0 transparent; } }
+}
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow">株式会社ReFast ／ SNS動画広告 絵コンテ v1</div>
+    <h1>佐藤さんの、二度目の入社式</h1>
+    <p class="lead">縦型60秒（Reels・TikTok・Shorts）。コピーは「人が足りないなら、人を伸ばせばいい。」です。ほとんどの人は音なしで見るので、テロップだけで話が分かるように作ります。</p>
+    <dl class="specs">
+      <div><dt>FORMAT</dt><dd>9:16 / 1080×1920 / 30fps</dd></div>
+      <div><dt>尺</dt><dd>60秒本編＋15秒カット版</dd></div>
+      <div><dt>キャスト</dt><dd>佐藤（58・事務）／社長（50代）／講師（30代）／若手社員（20代）／孫（6歳前後）</dd></div>
+      <div><dt>ロケ</dt><dd>町工場の事務所・社長室・会議室・公園（各1か所）</dd></div>
+    </dl>
+  </header>
+
+  <section>
+    <h2>色温度の流れ</h2>
+    <div class="strip-wrap">
+      <div class="strip" id="strip"></div>
+      <div class="strip-legend"><span>0:00 夜・蛍光灯（寒色）</span><span>0:20 変化の始まり</span><span>1:00 夕日（暖色）</span></div>
+    </div>
+    <p class="note">前半は青緑の蛍光灯、C5で講師が隣に座ったところから少しずつ暖色に寄せていきます。帯をタップするとそのカットに移動します。</p>
+  </section>
+
+  <section>
+    <h2>カット割り（60秒本編）</h2>
+    <p class="note">枠内の点線は、TikTok・Reelsの画面UI（いいね・キャプション）に隠れない安全エリアです。テロップは必ずこの内側に入れます。</p>
+    <div class="cuts" id="cuts"></div>
+  </section>
+
+  <section>
+    <h2>15秒カット版</h2>
+    <div class="tbl">
+      <table>
+        <thead><tr><th>秒</th><th>使用素材</th><th>テロップ</th><th>編集メモ</th></tr></thead>
+        <tbody>
+          <tr><td class="mono">0:00–0:03</td><td>C1</td><td>この会社、私がいないと回らないんです</td><td>本編そのまま。ドリーインの後半を使う</td></tr>
+          <tr><td class="mono">0:03–0:06</td><td>C4（手元）</td><td>58歳。パソコンは苦手でした。</td><td>新しいテロップ。顔のアップで止める</td></tr>
+          <tr><td class="mono">0:06–0:11</td><td>C6</td><td>今は、私が教えています。</td><td>「3か月後」の文字を0.5秒入れる</td></tr>
+          <tr><td class="mono">0:11–0:15</td><td>C7（帰る背中）→C9</td><td>人が足りないなら、人を伸ばせばいい。</td><td>エンドカードは2.5秒以上見せる</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <h2>撮影・編集の決まりごと</h2>
+    <div class="grid2">
+      <div class="box">
+        <h3>見た目で伝える仕掛け</h3>
+        <ul>
+          <li>佐藤さんは全カットで同じ<strong>からし色のカーディガン</strong>。見る人が一目で同じ人だと分かるようにします。</li>
+          <li><strong>C5とC6は同じ構図</strong>で撮ります。C5で講師がいた位置に、C6では佐藤さんが座ります。教わる側から教える側への入れ替わりを、構図だけで見せます。</li>
+          <li><strong>C2とC7は同じ壁掛け時計</strong>を同じ画角で撮ります。21:07と18:00の対比です。</li>
+          <li>講師は向かいではなく必ず<strong>横並び</strong>。「上から教えない」姿勢を絵で見せます。</li>
+        </ul>
+      </div>
+      <div class="box">
+        <h3>音とテロップ</h3>
+        <ul>
+          <li>0〜14秒はBGMなし。キーボード、秒針、FAXの音だけにします。</li>
+          <li>C4からピアノの単音が入り、C6でストリングスが重なって盛り上がり、C8の直前で一度音を引きます。</li>
+          <li>テロップは1画面に2行まで、1行あたり最大14文字。1文字0.1秒以上を目安に表示します。</li>
+          <li>数値テロップ（C7）には「※イメージです」を小さく入れます。実績が出たら差し替えます。</li>
+        </ul>
+      </div>
+      <div class="box">
+        <h3>小道具リスト</h3>
+        <ul>
+          <li>FAX機と受信紙の束、付箋だらけのモニター、卓上電卓、壁掛けアナログ時計</li>
+          <li>求人サイトの「応募 0件」画面（架空の画面を作る。実在サイトのロゴは使わない）</li>
+          <li>受発注の自動化画面（ReFastで作った想定のモック）</li>
+          <li>試作品（社長がC7で手に取る、業種に合わせた部品など）</li>
+        </ul>
+      </div>
+      <div class="box">
+        <h3>許諾と表記</h3>
+        <ul>
+          <li>出演者・ロケ先の肖像権と使用範囲（媒体・期間）の同意書</li>
+          <li>実在の顧客事例として出す場合は事例掲載の許諾</li>
+          <li>架空の場合は冒頭か末尾に「※実在の人物・団体とは関係ありません」</li>
+          <li>BGMは広告利用が可能なライセンスのものを使う</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+</div>
+
+<script>
+const C = { night: "#1f2c3a", night2: "#243444", dusk: "#3d4552", mid: "#5a4a48", warm: "#8a4f22", warm2: "#a0602a", end: "#15202b" };
+const ink = "rgba(255,255,255,.55)", ink2 = "rgba(255,255,255,.28)", amber = "#e0a04a";
+
+// Simple figure: head + body. c = body color (amber for 佐藤)
+const fig = (x, y, s = 1, c = ink2) =>
+  `<circle cx="${x}" cy="${y}" r="${6*s}" fill="${ink}"/><rect x="${x-9*s}" y="${y+7*s}" width="${18*s}" height="${22*s}" rx="${6*s}" fill="${c}"/>`;
+const safe = `<rect x="4" y="12" width="72" height="116" fill="none" stroke="rgba(255,255,255,.35)" stroke-dasharray="2 2" stroke-width=".6"/>`;
+
+const scenes = {
+  c1: `<rect width="90" height="160" fill="${C.night}"/>
+       <rect x="20" y="16" width="50" height="2" fill="#bfe3dc" opacity=".8"/>
+       <circle cx="72" cy="34" r="6" fill="none" stroke="${ink}" stroke-width="1"/><path d="M72 34 L72 30 M72 34 L75 35" stroke="${ink}" stroke-width=".8"/>
+       ${fig(45, 52, 1, amber)}
+       <rect x="30" y="58" width="30" height="20" rx="1.5" fill="#9fd0c8" opacity=".55"/>
+       <rect x="10" y="80" width="70" height="4" fill="${ink2}"/>
+       <rect x="14" y="66" width="12" height="14" fill="${ink2}"/><rect x="15" y="63" width="10" height="3" fill="${ink2}"/>`,
+  c2: `<rect width="90" height="160" fill="${C.night2}"/>
+       <g stroke="${ink2}" stroke-width=".6" fill="none"><rect x="6" y="20" width="38" height="38"/><rect x="46" y="20" width="38" height="38"/><rect x="6" y="60" width="38" height="38"/><rect x="46" y="60" width="38" height="38"/></g>
+       ${[0,1,2,3,4].map(i=>`<rect x="13" y="${46-i*4}" width="24" height="3" fill="${ink}"/>`).join("")}
+       <rect x="52" y="27" width="26" height="18" fill="#9fd0c8" opacity=".5"/>
+       <rect x="50" y="26" width="6" height="6" fill="#f4d35e"/><rect x="74" y="38" width="6" height="6" fill="#f4d35e"/><rect x="62" y="24" width="6" height="6" fill="#f4a3b5"/>
+       <rect x="16" y="66" width="18" height="26" rx="2" fill="${ink2}"/>${[0,1,2].map(r=>[0,1,2].map(c=>`<rect x="${18+c*5.5}" y="${76+r*5}" width="3.5" height="3" fill="${ink}"/>`).join("")).join("")}
+       <circle cx="65" cy="79" r="12" fill="none" stroke="${ink}" stroke-width="1"/><text x="65" y="82" text-anchor="middle" font-size="7" fill="#fff" font-family="monospace">21:07</text>`,
+  c3: `<rect width="90" height="160" fill="${C.night}"/>
+       <rect x="38" y="28" width="46" height="34" rx="2" fill="#dfe8ef" opacity=".85"/>
+       <text x="61" y="42" text-anchor="middle" font-size="5" fill="#334">応募状況</text>
+       <text x="61" y="54" text-anchor="middle" font-size="10" font-weight="700" fill="#c0392b">0件</text>
+       <circle cx="22" cy="70" r="16" fill="#0d151d"/><rect x="-6" y="84" width="52" height="60" rx="14" fill="#0d151d"/>`,
+  c4: `<rect width="90" height="160" fill="${C.dusk}"/>
+       <circle cx="45" cy="38" r="12" fill="${ink}"/><rect x="27" y="51" width="36" height="20" rx="8" fill="${amber}" opacity=".9"/>
+       <text x="66" y="34" font-size="12" fill="#fff" opacity=".8">?</text>
+       <path d="M18 120 L72 120 L66 92 L24 92 Z" fill="${ink2}"/><rect x="26" y="78" width="38" height="14" fill="#cfe0ea" opacity=".6"/>`,
+  c5: `<rect width="90" height="160" fill="${C.mid}"/>
+       ${fig(30, 48, 1, amber)}${fig(60, 48, 1, ink2)}
+       <rect x="30" y="76" width="30" height="18" rx="1.5" fill="#fbe7c6" opacity=".75"/>
+       <path d="M45 80 l1.6 3.4 3.4 1.6 -3.4 1.6 -1.6 3.4 -1.6 -3.4 -3.4 -1.6 3.4 -1.6z" fill="${amber}"/>
+       <rect x="8" y="94" width="74" height="4" fill="${ink2}"/>
+       <text x="60" y="38" text-anchor="middle" font-size="5" fill="#fff" opacity=".7">講師</text><text x="30" y="38" text-anchor="middle" font-size="5" fill="#fff" opacity=".7">佐藤</text>`,
+  c6: `<rect width="90" height="160" fill="${C.warm}"/>
+       ${fig(30, 48, 1, ink2)}${fig(60, 48, 1, amber)}
+       <rect x="30" y="76" width="30" height="18" rx="1.5" fill="#fff3dc" opacity=".85"/>
+       ${[0,1,2].map(i=>`<rect x="34" y="${80+i*4}" width="${22-i*5}" height="2" fill="${C.warm}"/>`).join("")}
+       <rect x="8" y="94" width="74" height="4" fill="${ink2}"/>
+       <text x="60" y="38" text-anchor="middle" font-size="5" fill="#fff" opacity=".8">佐藤</text><text x="30" y="38" text-anchor="middle" font-size="5" fill="#fff" opacity=".8">若手</text>
+       <text x="10" y="24" font-size="6" fill="#fff" opacity=".9">3か月後</text>`,
+  c7: `<rect width="90" height="160" fill="${C.warm2}"/>
+       <rect width="90" height="56" fill="${C.warm}"/>
+       <circle cx="45" cy="30" r="14" fill="none" stroke="${ink}" stroke-width="1.2"/><text x="45" y="33" text-anchor="middle" font-size="8" fill="#fff" font-family="monospace">18:00</text>
+       <circle cx="72" cy="72" r="9" fill="#f6c27a" opacity=".8"/>
+       <rect x="0" y="112" width="90" height="48" fill="#6b4a22"/>
+       <circle cx="16" cy="80" r="12" fill="#5d6b3a"/><rect x="14" y="88" width="4" height="24" fill="#4a3520"/>
+       ${fig(48, 78, .9, amber)}${fig(62, 90, .55, ink2)}`,
+  c8: `<rect width="90" height="160" fill="${C.warm}"/>
+       <circle cx="66" cy="30" r="22" fill="#f6c27a" opacity=".55"/>
+       <circle cx="45" cy="52" r="20" fill="${ink}"/>
+       <path d="M10 128 Q45 64 80 128 Z" fill="${amber}"/>
+       <path d="M38 56 q7 6 14 0" stroke="${C.warm}" stroke-width="1.4" fill="none"/>`,
+  c9: `<rect width="90" height="160" fill="${C.end}"/>
+       <path d="M45 34 l3 7 7 3 -7 3 -3 7 -3 -7 -7 -3 7 -3z" fill="${amber}"/>
+       <text x="45" y="70" text-anchor="middle" font-size="11" font-weight="700" fill="#fff">ReFast</text>
+       <rect x="16" y="112" width="58" height="12" rx="6" fill="${amber}"/><text x="45" y="120" text-anchor="middle" font-size="5.5" fill="#1b232c" font-weight="700">無料DX診断 30分</text>`
+};
+
+const cuts = [
+  { id:"c1", t:"0:00", e:"0:03", bg:C.night, title:"夜の事務所（フック）", shot:["ミディアム","正面・やや俯瞰","固定→ゆっくり寄る"],
+    vis:"夜9時。蛍光灯がひとつだけ点いた事務所で、佐藤さんが伝票を見ながらキーボードを打っている。",
+    telop:"この会社、私がいないと回らないんです", say:"佐藤（ナレーション・小声）：「この会社、私がいないと回らないんです」",
+    snd:"キーボードの音、時計の秒針。BGMなし。",
+    memo:"最初の1秒で人物の顔と文字を両方見せる。暗い画面でもテロップが読めるよう、文字に薄い影を付ける。" },
+  { id:"c2", t:"0:03", e:"0:08", bg:C.night2, title:"積み上がった仕事（インサート）", shot:["クローズアップ","4カット×約1.2秒","手持ちで少し揺らす"],
+    vis:"FAX用紙の束 → 付箋だらけのモニター → 電卓を叩く指 → 壁の時計「21:07」。",
+    telop:"…それが、怖かった。", say:"佐藤（ナレーション）：「…それが、怖かった。」",
+    snd:"FAX受信音を1回、電卓を叩く音。",
+    memo:"時計はC7と同じ物・同じ画角で撮る（時刻の対比に使う）。" },
+  { id:"c3", t:"0:08", e:"0:14", bg:C.night, title:"社長の悩み", shot:["肩越し","社長の背中ナメ","固定"],
+    vis:"社長室。社長が求人サイトの管理画面を見ている。「応募 0件」。眼鏡を外して目頭を押さえる。",
+    telop:"募集しても、誰も来ない", say:"社長：「募集しても、誰も来ない」（つぶやき）",
+    snd:"エアコンの低い音だけ。",
+    memo:"画面は架空のデザインで作る。実在の求人サイトのロゴやUIは映さない。" },
+  { id:"c4", t:"0:14", e:"0:20", bg:C.dusk, title:"研修初日", shot:["手元アップ→顔アップ","真横から","ゆっくりパン"],
+    vis:"昼の会議室。佐藤さんがノートPCの前で手を止めている。キーボードの上で指が迷う。",
+    telop:"私なんかに、AIなんて…", say:"佐藤：「私なんかに、AIなんて…」",
+    snd:"ピアノの単音が入る（BGMのスタート）。",
+    memo:"不安な表情は大げさにしない。少しうつむく程度。" },
+  { id:"c5", t:"0:20", e:"0:30", bg:C.mid, title:"隣に座る講師", shot:["2ショット","横並び・正面","固定"],
+    vis:"ReFastの講師が向かいではなく隣に座り、同じ画面をのぞく。佐藤さんが初めてAIに質問を打ち込み、答えが返ってきて小さく笑う。",
+    telop:"難しい言葉は、使いません。", say:"講師：「まず、いつもの仕事を一つだけ聞いてみましょう」",
+    snd:"ピアノが続く。Enterキーの音を少し大きめに。",
+    memo:"ここから色を暖色寄りにしていく。C6と同じ構図で撮る（佐藤さんは画面左、講師は右）。" },
+  { id:"c6", t:"0:30", e:"0:40", bg:C.warm, title:"3か月後、教える側へ", shot:["2ショット","C5と同じ構図","固定"],
+    vis:"「3か月後」の文字。同じ席に、今度は佐藤さんが講師の位置（右）に座り、若手社員に自分で作った受発注の自動化画面を見せている。",
+    telop:"3か月後、教わる人が、教える人になった。", say:"佐藤：「ここを押すと、注文書が全部まとまるのよ」",
+    snd:"ストリングスが重なり、ここで一番盛り上げる。",
+    memo:"この動画の感情のピーク。保存やシェアにつながる一文なので、テロップは2.5秒以上見せる。" },
+  { id:"c7", t:"0:40", e:"0:48", bg:C.warm2, title:"取り戻した時間", shot:["時計インサート→引き","公園はロング","ゆっくり横移動"],
+    vis:"C2と同じ時計が「18:00」。佐藤さんが定時で帰り、夕方の公園で孫と歩く。事務所では社長が新しい試作品を手に取っている（0.8秒）。",
+    telop:"残業 月40時間 → 5時間", say:"（セリフなし）",
+    snd:"子どもの笑い声を小さく。BGMは続く。",
+    memo:"数値は仮。「※イメージです」を小さく入れる。実績が出たら差し替える。" },
+  { id:"c8", t:"0:48", e:"0:55", bg:C.warm, title:"本人の言葉", shot:["バストアップ","カメラ目線","固定"],
+    vis:"夕日の逆光の中、佐藤さんがカメラに向かって話す。",
+    telop:"この歳で、仕事が楽しくなるなんて思わなかった", say:"佐藤：「この歳で、仕事が楽しくなるなんて思わなかった」",
+    snd:"セリフの直前でBGMを一度引き、声だけにする。",
+    memo:"演技ではなく、本人の言葉に聞こえるように。数テイク撮って一番自然なものを使う。" },
+  { id:"c9", t:"0:55", e:"1:00", bg:C.end, title:"エンドカード", shot:["グラフィック","—","光が灯るアニメーション"],
+    vis:"暗い画面に小さな光が灯り、ReFastのロゴが出る。コピーと「無料DX診断」のボタン。",
+    telop:"人が足りないなら、<br>人を伸ばせばいい。", say:"ナレーション：「人が足りないなら、人を伸ばせばいい。ReFast」",
+    snd:"光が灯るときに小さな「キラッ」という効果音。BGMを締める。",
+    memo:"CTAは「プロフィールのリンクから」。広告のボタン文言は「詳しくはこちら」より「無料で診断する」を推奨。" }
+];
+
+const sec = s => { const [m, x] = s.split(":").map(Number); return m*60 + x; };
+document.getElementById("strip").innerHTML = cuts.map((c, i) =>
+  `<a href="#${c.id}" style="flex:${sec(c.e)-sec(c.t)};background:${c.bg}" aria-label="C${i+1} ${c.title}">C${i+1}</a>`).join("");
+
+document.getElementById("cuts").innerHTML = cuts.map((c, i) => `
+  <article class="cut" id="${c.id}">
+    <div class="frame" style="background:${c.bg}">
+      <svg viewBox="0 0 90 160" preserveAspectRatio="xMidYMid slice" role="img" aria-label="C${i+1}のラフ">${scenes[c.id]}${safe}</svg>
+      <span class="tc">${c.t}</span>
+      <div class="telop">${c.telop}</div>
+    </div>
+    <div class="body">
+      <div class="head"><span class="num">C${i+1}</span><span class="title">${c.title}</span><span class="time">${c.t}–${c.e}（${sec(c.e)-sec(c.t)}秒）</span></div>
+      <div class="chips">${c.shot.map(s=>`<span class="chip">${s}</span>`).join("")}</div>
+      <dl class="rows">
+        <dt>映像</dt><dd>${c.vis}</dd>
+        <dt>テロップ</dt><dd class="say">${c.telop.replace("<br>","")}</dd>
+        <dt>セリフ</dt><dd>${c.say}</dd>
+        <dt>音</dt><dd>${c.snd}</dd>
+      </dl>
+      <div class="memo">${c.memo}</div>
+    </div>
+  </article>`).join("");
+</script>
