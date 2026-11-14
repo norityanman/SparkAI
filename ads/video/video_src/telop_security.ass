@@ -1,0 +1,28 @@
+[Script Info]
+ScriptType: v4.00+
+PlayResX: 1920
+PlayResY: 1080
+WrapStyle: 2
+ScaledBorderAndShadow: yes
+
+[V4+ Styles]
+Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
+Style: Telop,Noto Sans CJK JP,86,&H00FFFFFF,&H00FFFFFF,&H00301A0A,&H80000000,-1,0,0,0,100,100,4,0,1,7,4,2,60,60,70,1
+Style: Accent,Noto Sans CJK JP,112,&H0040D8FF,&H00FFFFFF,&H00301A0A,&H80000000,-1,0,0,0,100,100,6,0,1,8,4,2,60,60,70,1
+Style: Note,Noto Sans CJK JP,40,&H00FFFFFF,&H00FFFFFF,&H00301A0A,&H80000000,0,0,0,0,100,100,1,0,1,3,1,9,60,60,40,1
+Style: Catch,Noto Sans CJK JP,86,&H00FFFFFF,&H00FFFFFF,&H00301A0A,&H90000000,-1,0,0,0,100,100,4,0,1,7,5,5,40,40,0,1
+Style: Logo,Noto Sans CJK JP,190,&H0040D8FF,&H00FFFFFF,&H00301A0A,&H90000000,-1,0,0,0,100,100,10,0,1,7,5,5,80,80,0,1
+
+[Events]
+Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
+Dialogue: 0,0:00:00.60,0:00:04.60,Telop,,0,0,0,,{\fad(400,300)}AIは便利。でも、本当に安全なのかな…
+Dialogue: 0,0:00:05.30,0:00:09.30,Telop,,0,0,0,,{\fad(300,300)}AIがきっかけの\N情報漏えいも起きています
+Dialogue: 0,0:00:09.90,0:00:14.10,Telop,,0,0,0,,{\fad(300,400)}会社やお客さまに、迷惑をかけたら…
+Dialogue: 0,0:00:15.40,0:00:17.50,Telop,,0,0,0,,{\fad(400,200)}そんなときに見つけたのが――
+Dialogue: 0,0:00:17.60,0:00:19.80,Accent,,0,0,0,,{\fad(200,400)\t(0,250,\fscx115\fscy115)\t(250,450,\fscx100\fscy100)}SparkAI
+Dialogue: 0,0:00:21.00,0:00:24.30,Telop,,0,0,0,,{\fad(300,200)}入れていい情報と、ダメな情報
+Dialogue: 0,0:00:24.40,0:00:27.80,Telop,,0,0,0,,{\fad(200,300)}AIの安全な使い方を、一から学べる
+Dialogue: 0,0:00:28.70,0:00:33.20,Telop,,0,0,0,,{\fad(300,300)}今では、チームの\NAIルールづくりも任されるように
+Dialogue: 0,0:00:33.50,0:00:39.30,Telop,,0,0,0,,{\fad(700,0)\an7\pos(0,0)\p1\1c&H000000&\1a&H80&\bord0\shad0}m 0 0 l 1920 0 1920 1080 0 1080{\p0}
+Dialogue: 1,0:00:33.80,0:00:39.30,Catch,,0,0,0,,{\fad(500,0)\pos(960,420)}便利さも、信頼も、守り抜く。
+Dialogue: 1,0:00:35.80,0:00:39.30,Logo,,0,0,0,,{\fad(500,0)\pos(960,620)}SparkAI
