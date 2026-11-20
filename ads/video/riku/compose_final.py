@@ -24,6 +24,21 @@ def dur(p):
     return float(subprocess.check_output(["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "csv=p=0", str(p)]).strip())
 
 
+# ---------- 0) cut out broken frames (clip 2: phone floats without a hand while the can is set down) ----------
+CUTS = {1: (4.05, 5.8)}   # clip index -> (cut_from, cut_to) in seconds of the source clip
+CUT_XF = 0.25
+for i, (a, b) in CUTS.items():
+    src, fixed = CLIPS[i], WORK / f"clip{i}_cut.mp4"
+    off = a - CUT_XF
+    run("ffmpeg", "-hide_banner", "-loglevel", "error", "-y", "-i", src, "-filter_complex",
+        f"[0:v]trim=0:{a},setpts=PTS-STARTPTS[va];[0:v]trim={b},setpts=PTS-STARTPTS[vb];"
+        f"[va][vb]xfade=transition=fade:duration={CUT_XF}:offset={off}[v];"
+        f"[0:a]atrim=0:{a},asetpts=PTS-STARTPTS[aa];[0:a]atrim={b},asetpts=PTS-STARTPTS[ab];"
+        f"[aa][ab]acrossfade=d={CUT_XF}[a]",
+        "-map", "[v]", "-map", "[a]", "-c:v", "libx264", "-crf", "15", "-preset", "fast", "-pix_fmt", "yuv420p",
+        "-c:a", "aac", "-b:a", "256k", str(fixed))
+    CLIPS[i] = str(fixed)
+
 D = [dur(c) for c in CLIPS]
 starts = [0.0]
 for d in D[:-1]:
@@ -46,11 +61,11 @@ T = [  # (clip, start, end, lines, style) — times relative to each clip
     (0, 4.7, 7.4, ["鳴りやまない電話。", "配車が、組めない。"], "T"),
     (0, 7.7, 9.6, ["「この配車じゃ、", "帰れねぇよ」"], "T"),
     (0, 10.0, 14.6, ["誰も悪くないのに、", "毎日だれかが怒ってる。"], "T"),
-    (1, 0.4, 3.9, ["…AIって、", "うちみたいな会社でも？"], "T"),
-    (1, 4.2, 7.0, ["聞くだけなら、タダだし。"], "T"),
-    (1, 7.3, 9.4, ["SparkAIの、無料相談。"], "T"),
-    (1, 9.8, 12.3, ["怒られる前に、", "“すごい”って言われた。"], "T"),
-    (1, 12.6, 14.6, ["「この表、AIと一緒に", "作り直しましょう」"], "T"),
+    (1, 0.4, 3.7, ["…AIって、", "うちみたいな会社でも？"], "T"),   # clip 2 times are after the cut
+    (1, 3.9, 5.6, ["聞くだけなら、タダだし。"], "T"),
+    (1, 5.8, 7.6, ["SparkAIの、無料相談。"], "T"),
+    (1, 7.8, 10.3, ["怒られる前に、", "“すごい”って言われた。"], "T"),
+    (1, 10.6, 12.6, ["「この表、AIと一緒に", "作り直しましょう」"], "T"),
     (2, 0.4, 5.2, ["僕の頭の中を、", "AIに教えていく。"], "T"),
     (2, 5.6, 9.5, ["配車のルールを、", "ひとつずつ言葉に。"], "T"),
     (2, 10.0, 14.6, ["気づけば、仕事が", "楽しくなっていた。"], "T"),
