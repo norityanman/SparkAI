@@ -1,0 +1,882 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ネイルのご予約</title>
+<style>
+  :root {
+    color-scheme: light;
+    --primary: #0f9ea8;
+    --primary-dark: #0b7a82;
+    --primary-soft: #e3f5f6;
+    --primary-line: #b6e2e5;
+    --bg: #f5fafa;
+    --card: #ffffff;
+    --text: #29393b;
+    --muted: #6b7f81;
+    --line: #dde8e9;
+    --disabled: #eef1f1;
+    --disabled-text: #a9b5b6;
+    --warn-bg: #fff7ec;
+    --warn-line: #f1d7ad;
+    --warn-text: #7a5520;
+    --radius: 14px;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: "Hiragino Kaku Gothic ProN", "Hiragino Sans", "Yu Gothic UI", "Meiryo", system-ui, sans-serif;
+    font-size: 16px;
+    line-height: 1.7;
+  }
+  header.site {
+    background: var(--primary);
+    color: #fff;
+  }
+  .site-inner {
+    max-width: 880px;
+    margin: 0 auto;
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .brand { font-size: 1.15rem; font-weight: 700; letter-spacing: .04em; }
+  .brand small { display: block; font-size: .75rem; font-weight: 400; opacity: .9; letter-spacing: 0; }
+  .view-switch { display: flex; background: rgba(255,255,255,.18); border-radius: 999px; padding: 3px; }
+  .view-switch button {
+    border: 0; background: transparent; color: #fff; font: inherit; font-size: .9rem;
+    padding: 6px 14px; border-radius: 999px; cursor: pointer;
+  }
+  .view-switch button.on { background: #fff; color: var(--primary-dark); font-weight: 700; }
+  main { max-width: 880px; margin: 0 auto; padding: 20px 16px 60px; }
+  h1 { font-size: 1.35rem; margin: 4px 0 6px; }
+  h2 { font-size: 1.1rem; margin: 0 0 10px; }
+  p { margin: 0 0 10px; }
+  .muted { color: var(--muted); font-size: .92rem; }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 18px;
+    margin-bottom: 16px;
+  }
+  .grid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; }
+  .choice {
+    display: block; width: 100%; text-align: left;
+    background: var(--card); border: 2px solid var(--line); border-radius: var(--radius);
+    padding: 16px; font: inherit; color: inherit; cursor: pointer;
+    transition: border-color .15s, background .15s;
+  }
+  .choice:hover { border-color: var(--primary-line); background: #fbfefe; }
+  .choice.on { border-color: var(--primary); background: var(--primary-soft); }
+  .choice .t { font-weight: 700; font-size: 1.05rem; }
+  .choice .s { color: var(--muted); font-size: .9rem; }
+  .big-choice { padding: 24px 20px; }
+  .big-choice .t { font-size: 1.15rem; color: var(--primary-dark); }
+
+  .btn {
+    display: inline-block; border: 0; border-radius: 999px; font: inherit; cursor: pointer;
+    padding: 11px 24px; font-weight: 700; text-decoration: none;
+  }
+  .btn-primary { background: var(--primary); color: #fff; }
+  .btn-primary:hover { background: var(--primary-dark); }
+  .btn-primary:disabled { background: var(--disabled); color: var(--disabled-text); cursor: not-allowed; }
+  .btn-ghost { background: transparent; color: var(--primary-dark); border: 1.5px solid var(--primary-line); }
+  .btn-ghost:hover { background: var(--primary-soft); }
+  .btn-quiet { background: transparent; color: var(--muted); border: 1.5px solid var(--line); }
+  .btn-small { padding: 5px 14px; font-size: .88rem; }
+  .actions { display: flex; gap: 10px; flex-wrap: wrap; justify-content: space-between; margin-top: 18px; }
+  .actions.end { justify-content: flex-end; }
+
+  .steps { display: flex; gap: 6px; margin: 4px 0 18px; padding: 0; list-style: none; flex-wrap: wrap; }
+  .steps li {
+    flex: 1 1 0; min-width: 70px; text-align: center; font-size: .8rem; color: var(--muted);
+    padding: 6px 4px; border-bottom: 3px solid var(--line);
+  }
+  .steps li.done { color: var(--primary-dark); border-color: var(--primary-line); }
+  .steps li.now { color: var(--primary-dark); border-color: var(--primary); font-weight: 700; }
+
+  .summary { background: var(--primary-soft); border-radius: 10px; padding: 12px 16px; margin-bottom: 14px; }
+  .summary dl { display: grid; grid-template-columns: auto 1fr; gap: 2px 14px; margin: 0; }
+  .summary dt { color: var(--muted); font-size: .9rem; }
+  .summary dd { margin: 0; font-weight: 700; }
+
+  /* Calendar */
+  .cal-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+  .cal-head .m { font-weight: 700; }
+  .cal-nav { border: 1.5px solid var(--line); background: #fff; border-radius: 999px; width: 38px; height: 38px; cursor: pointer; font-size: 1rem; color: var(--primary-dark); }
+  .cal-nav:disabled { color: var(--disabled-text); cursor: not-allowed; }
+  .cal { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+  .cal .wd { text-align: center; font-size: .78rem; color: var(--muted); padding-bottom: 2px; }
+  .cal .wd.sun { color: #c0646b; } .cal .wd.sat { color: #4f7fb0; }
+  .day {
+    aspect-ratio: 1 / 1; border-radius: 10px; border: 1.5px solid var(--primary-line);
+    background: #fff; font: inherit; cursor: pointer; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; padding: 0; color: var(--text); font-size: .95rem;
+  }
+  .day small { font-size: .62rem; line-height: 1; color: var(--muted); }
+  .day:hover:not(:disabled) { background: var(--primary-soft); }
+  .day:disabled { background: var(--disabled); border-color: transparent; color: var(--disabled-text); cursor: not-allowed; }
+  .day:disabled small { color: var(--disabled-text); }
+  .day.on { background: var(--primary); border-color: var(--primary); color: #fff; }
+  .day.on small { color: #fff; }
+  .day.work { background: var(--primary-soft); border-color: var(--primary); }
+  .day.today { outline: 2px dashed var(--primary-line); outline-offset: 1px; }
+  .day.empty { visibility: hidden; }
+  .legend { display: flex; gap: 14px; flex-wrap: wrap; font-size: .82rem; color: var(--muted); margin-top: 8px; }
+  .legend span::before { content: ""; display: inline-block; width: 12px; height: 12px; border-radius: 3px; margin-right: 5px; vertical-align: -1px; }
+  .legend .l-ok::before { background: #fff; border: 1.5px solid var(--primary-line); }
+  .legend .l-no::before { background: var(--disabled); }
+  .legend .l-on::before { background: var(--primary); }
+  .legend .l-work::before { background: var(--primary-soft); border: 1.5px solid var(--primary); }
+
+  .slots { display: grid; grid-template-columns: repeat(auto-fill, minmax(86px, 1fr)); gap: 8px; }
+  .slot {
+    border: 1.5px solid var(--primary-line); background: #fff; border-radius: 10px; padding: 8px 4px;
+    font: inherit; cursor: pointer; color: var(--text);
+  }
+  .slot:hover:not(:disabled) { background: var(--primary-soft); }
+  .slot:disabled { background: var(--disabled); border-color: transparent; color: var(--disabled-text); cursor: not-allowed; text-decoration: line-through; }
+  .slot.on { background: var(--primary); border-color: var(--primary); color: #fff; font-weight: 700; }
+  .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+  @media (max-width: 680px) { .cols { grid-template-columns: 1fr; } }
+
+  label.f { display: block; margin-bottom: 12px; }
+  label.f span { display: block; font-size: .9rem; color: var(--muted); margin-bottom: 4px; }
+  input[type=text], input[type=tel], input[type=number], input[type=datetime-local], select {
+    width: 100%; font: inherit; padding: 10px 12px; border: 1.5px solid var(--line); border-radius: 10px; background: #fff; color: var(--text);
+  }
+  input:focus, select:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-soft); }
+  .err { color: #b4505a; font-size: .88rem; margin-top: 4px; }
+
+  .note {
+    background: var(--primary-soft); border-left: 4px solid var(--primary); border-radius: 8px;
+    padding: 10px 14px; font-size: .92rem; margin: 12px 0;
+  }
+  .gentle {
+    background: var(--warn-bg); border: 1px solid var(--warn-line); color: var(--warn-text);
+    border-radius: 12px; padding: 14px 16px; margin: 12px 0;
+  }
+  .done-no { font-size: 2rem; font-weight: 700; color: var(--primary-dark); letter-spacing: .08em; }
+  .badge { display: inline-block; font-size: .75rem; padding: 1px 10px; border-radius: 999px; background: var(--primary-soft); color: var(--primary-dark); font-weight: 700; }
+  .badge.gray { background: var(--disabled); color: var(--muted); }
+
+  /* Shop */
+  .tabs { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 16px; border-bottom: 1px solid var(--line); }
+  .tabs button {
+    border: 0; background: transparent; font: inherit; padding: 8px 14px; cursor: pointer; color: var(--muted);
+    border-bottom: 3px solid transparent; margin-bottom: -1px;
+  }
+  .tabs button.on { color: var(--primary-dark); border-color: var(--primary); font-weight: 700; }
+  .filters { display: flex; gap: 10px; flex-wrap: wrap; align-items: end; margin-bottom: 12px; }
+  .filters label.f { margin: 0; min-width: 160px; }
+  .day-group { margin-bottom: 16px; }
+  .day-group h3 { font-size: 1rem; margin: 0 0 6px; color: var(--primary-dark); }
+  .tbl-wrap { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: .92rem; background: #fff; }
+  th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+  th { color: var(--muted); font-weight: 400; font-size: .82rem; background: #fafdfd; }
+  tr.cancelled td { color: var(--disabled-text); text-decoration: line-through; }
+  tr.cancelled td.st { text-decoration: none; }
+  .row-form { display: grid; grid-template-columns: 2fr 1fr 1fr auto; gap: 8px; align-items: center; margin-bottom: 8px; }
+  @media (max-width: 600px) { .row-form { grid-template-columns: 1fr 1fr; } }
+  .toast {
+    position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%);
+    background: var(--primary-dark); color: #fff; padding: 10px 20px; border-radius: 999px;
+    font-size: .92rem; box-shadow: 0 6px 20px rgba(0,0,0,.15); z-index: 10; max-width: calc(100% - 32px);
+  }
+  .debug-banner { background: #fff3d6; color: #7a5520; text-align: center; font-size: .85rem; padding: 6px 16px; }
+</style>
+</head>
+<body>
+<header class="site">
+  <div class="site-inner">
+    <div class="brand">ネイルサロン<small>Web ご予約</small></div>
+    <div class="view-switch" role="tablist">
+      <button data-act="view" data-v="customer" id="sw-customer">お客様</button>
+      <button data-act="view" data-v="shop" id="sw-shop">お店の方</button>
+    </div>
+  </div>
+</header>
+<div id="debug"></div>
+<main id="app"></main>
+<div id="toast"></div>
+
+<script>
+'use strict';
+
+/* ===== 決まりごと(あとでお店の方が決めたら入れかえます) ===== */
+const OPEN_MIN = 10 * 60;   // 営業開始 10:00(仮)
+const CLOSE_MIN = 19 * 60;  // 営業終了 19:00(仮)
+const STEP_MIN = 30;        // 30分ごとに予約を受けつける(仮)
+const DAYS_AHEAD = 30;      // 30日先まで予約を受けつける(仮)
+const DEADLINE_HOUR = 18;   // 予約日の前日18時まで、キャンセル・変更ができる
+const STORE_KEY = 'nail-salon-yoyaku-v1';
+
+/* ===== 日付の道具 ===== */
+const pad = n => String(n).padStart(2, '0');
+const ymd = d => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+const fromYmd = s => { const [y, m, d] = s.split('-').map(Number); return new Date(y, m - 1, d); };
+const addDays = (d, n) => { const x = new Date(d); x.setDate(x.getDate() + n); return x; };
+const hm = m => `${Math.floor(m / 60)}:${pad(m % 60)}`;
+const WD = '日月火水木金土';
+const fmtDate = s => { const d = fromYmd(s); return `${d.getFullYear()}年${d.getMonth() + 1}月${d.getDate()}日(${WD[d.getDay()]})`; };
+const fmtDateShort = s => { const d = fromYmd(s); return `${d.getMonth() + 1}月${d.getDate()}日(${WD[d.getDay()]})`; };
+const fmtDateTime = d => `${d.getMonth() + 1}月${d.getDate()}日(${WD[d.getDay()]}) ${d.getHours()}:${pad(d.getMinutes())}`;
+const yen = n => '¥' + Number(n).toLocaleString('ja-JP');
+const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const normPhone = s => String(s).replace(/[０-９]/g, c => String.fromCharCode(c.charCodeAt(0) - 0xFEE0)).replace(/[^0-9]/g, '');
+
+/* ===== 保存 ===== */
+let storageOK = true;
+let data = load();
+
+function load() {
+  try {
+    const raw = localStorage.getItem(STORE_KEY);
+    if (raw) return JSON.parse(raw);
+  } catch (e) { storageOK = false; }
+  const d = seed();
+  persist(d);
+  return d;
+}
+function persist(d = data) {
+  try { localStorage.setItem(STORE_KEY, JSON.stringify(d)); } catch (e) { storageOK = false; }
+}
+
+/* 見本のデータ(名前も電話番号もすべて作り物です) */
+function seed() {
+  const today = new Date(); today.setHours(0, 0, 0, 0);
+  const staff = [
+    { id: 's1', name: '見本 さくら', pattern: [1, 2, 3, 5, 6] }, // 月火水金土
+    { id: 's2', name: '見本 あおい', pattern: [0, 2, 4, 5, 6] }, // 日火木金土
+  ].map(s => {
+    const days = [];
+    for (let i = 0; i <= 60; i++) { const d = addDays(today, i); if (s.pattern.includes(d.getDay())) days.push(ymd(d)); }
+    return { id: s.id, name: s.name, workDays: days };
+  });
+  const menus = [
+    { id: 'm1', name: 'ワンカラー', minutes: 60, price: 5500 },
+    { id: 'm2', name: 'グラデーション', minutes: 90, price: 6600 },
+    { id: 'm3', name: 'アート(お好きなデザイン)', minutes: 120, price: 8800 },
+    { id: 'm4', name: 'ケア・ジェルオフのみ', minutes: 30, price: 3300 },
+  ];
+  const firstWork = (s, from) => s.workDays.find(d => d >= ymd(addDays(today, from)));
+  const d1 = firstWork(staff[0], 2), d2 = firstWork(staff[1], 3);
+  const mk = (no, sId, mId, date, start, name, phone) => {
+    const m = menus.find(x => x.id === mId);
+    return { id: no, staffId: sId, menuId: mId, menuName: m.name, minutes: m.minutes, price: m.price,
+             date, start, name, phone, status: 'active', createdAt: new Date().toISOString() };
+  };
+  const bookings = [
+    mk('N1001', 's1', 'm1', d1, 11 * 60, '見本 花子', '09000000000'),
+    mk('N1002', 's1', 'm3', d1, 14 * 60, '見本 次郎', '08000000000'),
+    mk('N1003', 's2', 'm2', d2, 10 * 60 + 30, '見本 桃子', '07000000000'),
+  ];
+  return { staff, menus, bookings, debugNow: null };
+}
+
+/* ===== ルール ===== */
+function now() { return data.debugNow ? new Date(data.debugNow) : new Date(); }
+function todayYmd() { return ymd(now()); }
+function lastYmd() { return ymd(addDays(fromYmd(todayYmd()), DAYS_AHEAD)); }
+const staffById = id => data.staff.find(s => s.id === id);
+function menuById(id) {
+  // 日にち変更のとき、メニューが変わっていたら予約したときの内容を使う
+  if (id === '__booking__' && ui.bk.editingId) {
+    const b = data.bookings.find(x => x.id === ui.bk.editingId);
+    return { id, name: b.menuName, minutes: b.minutes, price: b.price };
+  }
+  return data.menus.find(m => m.id === id);
+}
+const staffName = id => (staffById(id) || { name: '(登録なし)' }).name;
+
+function slotsFor(staffId, date, minutes, excludeId) {
+  const busy = data.bookings.filter(b => b.status === 'active' && b.staffId === staffId && b.date === date && b.id !== excludeId);
+  const n = now();
+  const isToday = date === ymd(n);
+  const nowMin = n.getHours() * 60 + n.getMinutes();
+  const out = [];
+  for (let t = OPEN_MIN; t < CLOSE_MIN; t += STEP_MIN) {
+    let ok = true;
+    if (t + minutes > CLOSE_MIN) ok = false;                                         // メニューの時間が入りきらない
+    else if (busy.some(b => t < b.start + b.minutes && b.start < t + minutes)) ok = false; // すでに予約がある
+    else if (isToday && t <= nowMin) ok = false;                                     // もうすぎた時間
+    out.push({ t, ok });
+  }
+  return out;
+}
+function dayStatus(staffId, date, minutes, excludeId) {
+  const s = staffById(staffId);
+  if (date < todayYmd() || date > lastYmd()) return 'out';
+  if (!s || !s.workDays.includes(date)) return 'off';
+  return slotsFor(staffId, date, minutes, excludeId).some(x => x.ok) ? 'ok' : 'full';
+}
+function deadlineOf(b) { const d = addDays(fromYmd(b.date), -1); d.setHours(DEADLINE_HOUR, 0, 0, 0); return d; }
+function canChange(b) { return b.status === 'active' && now() < deadlineOf(b); }
+function isPast(b) { const end = fromYmd(b.date); end.setMinutes(b.start + b.minutes); return now() >= end; }
+function newBookingNo() {
+  let no;
+  do { no = 'N' + Math.floor(1000 + Math.random() * 9000); } while (data.bookings.some(b => b.id === no));
+  return no;
+}
+function nextWorkDay(s) { const t = todayYmd(), l = lastYmd(); return s.workDays.filter(d => d >= t && d <= l).sort()[0]; }
+
+/* ===== 画面の状態 ===== */
+const ui = {
+  view: 'customer',
+  page: 'home',        // home | book | done | lookup | manage
+  step: 1,
+  bk: {},              // 予約中の内容
+  form: { name: '', phone: '' },
+  errors: {},
+  lookup: { no: '', phone: '', err: '' },
+  manageId: null,
+  confirmCancel: false,
+  doneId: null,
+  doneKind: '',
+  shopTab: 'list',
+  list: { range: 'future', staff: 'all', showCancelled: true },
+  attStaff: null,
+  attMonth: null,
+};
+
+/* ===== カレンダー ===== */
+function calendarHTML(monthYmd, dayFn, navMin, navMax) {
+  const first = fromYmd(monthYmd);
+  const y = first.getFullYear(), m = first.getMonth();
+  const daysIn = new Date(y, m + 1, 0).getDate();
+  const prevOk = !navMin || ymd(new Date(y, m, 0)) >= navMin;
+  const nextOk = !navMax || ymd(new Date(y, m + 1, 1)) <= navMax;
+  let h = `<div class="cal-head">
+    <button class="cal-nav" data-act="calmonth" data-d="-1" ${prevOk ? '' : 'disabled'} aria-label="前の月">‹</button>
+    <span class="m">${y}年${m + 1}月</span>
+    <button class="cal-nav" data-act="calmonth" data-d="1" ${nextOk ? '' : 'disabled'} aria-label="次の月">›</button>
+  </div><div class="cal">`;
+  WD.split('').forEach((w, i) => { h += `<div class="wd ${i === 0 ? 'sun' : i === 6 ? 'sat' : ''}">${w}</div>`; });
+  for (let i = 0; i < first.getDay(); i++) h += `<div class="day empty"></div>`;
+  for (let d = 1; d <= daysIn; d++) {
+    const ds = `${y}-${pad(m + 1)}-${pad(d)}`;
+    const o = dayFn(ds);
+    h += `<button class="day ${o.cls || ''} ${ds === todayYmd() ? 'today' : ''}" data-act="calday" data-date="${ds}" ${o.disabled ? 'disabled' : ''} title="${esc(o.title || '')}">${d}${o.sub ? `<small>${o.sub}</small>` : '<small>&nbsp;</small>'}</button>`;
+  }
+  return h + '</div>';
+}
+function monthOf(ds) { return ds.slice(0, 8) + '01'; }
+function shiftMonth(ms, n) { const d = fromYmd(ms); return ymd(new Date(d.getFullYear(), d.getMonth() + n, 1)); }
+
+/* ===== 描画 ===== */
+const $app = document.getElementById('app');
+function render() {
+  document.getElementById('sw-customer').classList.toggle('on', ui.view === 'customer');
+  document.getElementById('sw-shop').classList.toggle('on', ui.view === 'shop');
+  document.getElementById('debug').innerHTML = data.debugNow
+    ? `<div class="debug-banner">動作確認中:いまの日時を「${fmtDateTime(now())}」として動いています(お店の方の画面 → 動作確認 で元に戻せます)</div>` : '';
+  let h = '';
+  if (!storageOK) h += `<div class="gentle">このブラウザでは予約を保存できないようです。画面を閉じると内容が消えてしまいますので、ご注意ください。</div>`;
+  h += ui.view === 'customer' ? renderCustomer() : renderShop();
+  $app.innerHTML = h;
+}
+
+/* ----- お客様 ----- */
+function renderCustomer() {
+  switch (ui.page) {
+    case 'book': return renderBook();
+    case 'done': return renderDone();
+    case 'lookup': return renderLookup();
+    case 'manage': return renderManage();
+    default: return renderHome();
+  }
+}
+function renderHome() {
+  return `
+  <h1>ようこそ</h1>
+  <p class="muted">ご来店のご予約を、こちらから承っております。</p>
+  <div class="grid2" style="margin-top:16px">
+    <button class="choice big-choice" data-act="startBook">
+      <div class="t">ご予約をとる</div>
+      <div class="s">担当のネイリスト、メニュー、日にちとお時間をお選びいただけます。</div>
+    </button>
+    <button class="choice big-choice" data-act="goLookup">
+      <div class="t">ご予約の確認・変更・キャンセル</div>
+      <div class="s">予約番号とお電話番号で、ご予約内容をご確認いただけます。</div>
+    </button>
+  </div>
+  <div class="note">キャンセルや日にちの変更は、<b>ご予約日の前日18時まで</b>こちらの画面から承ります。</div>`;
+}
+function stepsHTML() {
+  const labels = ui.bk.editingId ? ['ネイリスト', 'メニュー', '日にち・時間', '変更の確認'] : ['ネイリスト', 'メニュー', '日にち・時間', 'お客様情報'];
+  return `<ol class="steps">${labels.map((l, i) => `<li class="${i + 1 < ui.step ? 'done' : i + 1 === ui.step ? 'now' : ''}">${i + 1}. ${l}</li>`).join('')}</ol>`;
+}
+function summaryHTML(extra = '') {
+  const b = ui.bk; const m = menuById(b.menuId);
+  const rows = [];
+  if (b.staffId) rows.push(['ネイリスト', esc(staffName(b.staffId))]);
+  if (m) rows.push(['メニュー', `${esc(m.name)}(${m.minutes}分・${yen(m.price)})`]);
+  if (b.date && b.start != null) rows.push(['日にち・時間', `${fmtDate(b.date)} ${hm(b.start)}〜${hm(b.start + m.minutes)}`]);
+  if (!rows.length) return '';
+  return `<div class="summary"><dl>${rows.map(r => `<dt>${r[0]}</dt><dd>${r[1]}</dd>`).join('')}${extra}</dl></div>`;
+}
+function renderBook() {
+  const b = ui.bk;
+  let h = `<h1>${b.editingId ? 'ご予約日の変更' : 'ご予約'}</h1>` + stepsHTML();
+  if (ui.step === 1) {
+    h += `<div class="card"><h2>担当のネイリストをお選びください</h2><div class="grid2">`;
+    data.staff.forEach(s => {
+      const nw = nextWorkDay(s);
+      h += `<button class="choice ${b.staffId === s.id ? 'on' : ''}" data-act="pickStaff" data-id="${s.id}">
+        <div class="t">${esc(s.name)}</div>
+        <div class="s">${nw ? `次の出勤日:${fmtDateShort(nw)}` : 'ただいまご予約いただける日がありません'}</div></button>`;
+    });
+    h += `</div></div><div class="actions"><button class="btn btn-quiet" data-act="home">はじめに戻る</button></div>`;
+  } else if (ui.step === 2) {
+    h += summaryHTML() + `<div class="card"><h2>メニューをお選びください</h2><div class="grid2">`;
+    data.menus.forEach(m => {
+      h += `<button class="choice ${b.menuId === m.id ? 'on' : ''}" data-act="pickMenu" data-id="${m.id}">
+        <div class="t">${esc(m.name)}</div><div class="s">およそ ${m.minutes}分 ・ ${yen(m.price)}</div></button>`;
+    });
+    if (!data.menus.length) h += `<p class="muted">ただいまご予約いただけるメニューがありません。</p>`;
+    h += `</div></div><div class="actions"><button class="btn btn-quiet" data-act="step" data-s="1">もどる</button></div>`;
+  } else if (ui.step === 3) {
+    const m = menuById(b.menuId);
+    if (!b.month) b.month = monthOf(todayYmd());
+    const cal = calendarHTML(b.month, ds => {
+      const st = dayStatus(b.staffId, ds, m.minutes, b.editingId);
+      if (st === 'ok') return { cls: b.date === ds ? 'on' : '', sub: '○', title: 'ご予約いただけます' };
+      if (st === 'full') return { disabled: true, sub: '満', title: 'ご予約がいっぱいです' };
+      if (st === 'off') return { disabled: true, sub: '休', title: 'お休みの日です' };
+      return { disabled: true };
+    }, monthOf(todayYmd()), lastYmd());
+    let slots = `<p class="muted">左のカレンダーから、日にちをお選びください。</p>`;
+    if (b.date) {
+      const list = slotsFor(b.staffId, b.date, m.minutes, b.editingId);
+      slots = `<p><b>${fmtDateShort(b.date)}</b> の空いているお時間</p><div class="slots">` +
+        list.map(x => `<button class="slot ${b.start === x.t ? 'on' : ''}" data-act="pickTime" data-t="${x.t}" ${x.ok ? '' : 'disabled'}>${hm(x.t)}</button>`).join('') +
+        `</div><p class="muted" style="margin-top:8px">線が引かれたお時間は、ご予約が入っているか、メニューのお時間(${m.minutes}分)が営業時間内におさまらないため、お選びいただけません。</p>`;
+    }
+    h += summaryHTML() + `<div class="card"><h2>日にちとお時間をお選びください</h2><div class="cols"><div>${cal}
+      <div class="legend"><span class="l-ok">選べます</span><span class="l-no">選べません(休・満)</span><span class="l-on">選んだ日</span></div></div>
+      <div>${slots}</div></div></div>
+      <div class="actions">
+        ${b.editingId ? `<button class="btn btn-quiet" data-act="backToManage">変更をやめる</button>` : `<button class="btn btn-quiet" data-act="step" data-s="2">もどる</button>`}
+        <button class="btn btn-primary" data-act="step" data-s="4" ${b.date && b.start != null ? '' : 'disabled'}>つぎへ</button>
+      </div>`;
+  } else if (ui.step === 4) {
+    if (b.editingId) {
+      const old = data.bookings.find(x => x.id === b.editingId);
+      h += `<div class="card"><h2>こちらの日時に変更してよろしいですか?</h2>
+        <div class="summary" style="background:var(--disabled)"><dl><dt>変更前</dt><dd>${fmtDate(old.date)} ${hm(old.start)}〜${hm(old.start + old.minutes)}</dd></dl></div>
+        ${summaryHTML()}</div>
+        <div class="actions"><button class="btn btn-quiet" data-act="step" data-s="3">もどる</button>
+        <button class="btn btn-primary" data-act="submitChange">この日時に変更する</button></div>`;
+    } else {
+      const e = ui.errors;
+      const dl = deadlineOf({ date: b.date });
+      h += summaryHTML() + `<div class="card"><h2>お客様のお名前とご連絡先をご入力ください</h2>
+        <label class="f"><span>お名前</span><input type="text" id="f-name" value="${esc(ui.form.name)}" placeholder="例:見本 花子" autocomplete="name">${e.name ? `<div class="err">${e.name}</div>` : ''}</label>
+        <label class="f"><span>お電話番号</span><input type="tel" id="f-phone" value="${esc(ui.form.phone)}" placeholder="例:090-0000-0000" autocomplete="tel">${e.phone ? `<div class="err">${e.phone}</div>` : ''}</label>
+        <div class="note">キャンセルや日にちの変更は、<b>${fmtDateTime(dl)}</b> までこちらの画面から承ります。</div>
+        </div>
+        <div class="actions"><button class="btn btn-quiet" data-act="step" data-s="3">もどる</button>
+        <button class="btn btn-primary" data-act="submitBook">この内容で予約する</button></div>`;
+    }
+  }
+  return h;
+}
+function renderDone() {
+  const b = data.bookings.find(x => x.id === ui.doneId);
+  const changed = ui.doneKind === 'change';
+  return `<div class="card" style="text-align:center">
+    <h1>${changed ? 'ご予約日を変更いたしました' : 'ご予約ありがとうございます'}</h1>
+    <p class="muted">${changed ? '新しい日時でお待ちしております。' : 'ご来店を心よりお待ちしております。'}</p>
+    <p style="margin-top:14px">予約番号</p>
+    <div class="done-no">${b.id}</div>
+    <p class="muted">ご確認・変更・キャンセルの際に必要になりますので、お控えください。</p>
+  </div>
+  ${bookingDetailHTML(b)}
+  <div class="note">キャンセルや日にちの変更は、<b>${fmtDateTime(deadlineOf(b))}</b> までこちらの画面から承ります。</div>
+  <div class="actions end"><button class="btn btn-ghost" data-act="home">はじめの画面へ</button></div>`;
+}
+function bookingDetailHTML(b) {
+  return `<div class="summary"><dl>
+    <dt>予約番号</dt><dd>${esc(b.id)}</dd>
+    <dt>お名前</dt><dd>${esc(b.name)} 様</dd>
+    <dt>ネイリスト</dt><dd>${esc(staffName(b.staffId))}</dd>
+    <dt>メニュー</dt><dd>${esc(b.menuName)}(${b.minutes}分・${yen(b.price)})</dd>
+    <dt>日にち・時間</dt><dd>${fmtDate(b.date)} ${hm(b.start)}〜${hm(b.start + b.minutes)}</dd>
+  </dl></div>`;
+}
+function renderLookup() {
+  const l = ui.lookup;
+  return `<h1>ご予約の確認・変更・キャンセル</h1>
+  <div class="card">
+    <p>ご予約のときにお伝えした予約番号と、ご登録のお電話番号をご入力ください。</p>
+    <label class="f"><span>予約番号</span><input type="text" id="l-no" value="${esc(l.no)}" placeholder="例:N1001"></label>
+    <label class="f"><span>お電話番号</span><input type="tel" id="l-phone" value="${esc(l.phone)}" placeholder="例:090-0000-0000"></label>
+    ${l.err ? `<div class="err">${l.err}</div>` : ''}
+  </div>
+  <div class="actions"><button class="btn btn-quiet" data-act="home">はじめに戻る</button>
+  <button class="btn btn-primary" data-act="doLookup">ご予約を確認する</button></div>`;
+}
+function renderManage() {
+  const b = data.bookings.find(x => x.id === ui.manageId);
+  let h = `<h1>ご予約内容</h1>${bookingDetailHTML(b)}`;
+  if (b.status === 'cancelled') {
+    h += `<div class="note">こちらのご予約は、キャンセル済みです。またのご予約をお待ちしております。</div>`;
+  } else if (isPast(b)) {
+    h += `<div class="note">こちらのご予約の日は、すでにすぎております。ご来店ありがとうございました。</div>`;
+  } else if (canChange(b)) {
+    h += `<div class="note">キャンセルや日にちの変更は、<b>${fmtDateTime(deadlineOf(b))}</b> まで承ります。</div>`;
+    if (ui.confirmCancel) {
+      h += `<div class="card"><h2>こちらのご予約をキャンセルしてよろしいですか?</h2>
+        <p class="muted">キャンセルすると、元に戻すことはできません。</p>
+        <div class="actions"><button class="btn btn-quiet" data-act="cancelNo">やめる</button>
+        <button class="btn btn-primary" data-act="cancelYes">キャンセルする</button></div></div>`;
+    } else {
+      h += `<div class="actions"><button class="btn btn-ghost" data-act="cancelAsk">ご予約をキャンセルする</button>
+        <button class="btn btn-primary" data-act="startChange">日にちを変更する</button></div>`;
+    }
+  } else {
+    h += `<div class="gentle"><b>申し訳ありません。</b><br>
+      ご予約日の前日18時(${fmtDateTime(deadlineOf(b))})をすぎたため、こちらの画面からはキャンセルや日にちの変更ができなくなっております。<br>
+      お手数をおかけしますが、お店まで<b>お電話でご連絡いただけますか</b>。</div>`;
+  }
+  h += `<div class="actions"><button class="btn btn-quiet" data-act="home">はじめの画面へ</button></div>`;
+  return h;
+}
+
+/* ----- お店の方 ----- */
+function renderShop() {
+  const tabs = [['list', '予約一覧'], ['att', '出勤日'], ['menu', 'メニュー'], ['staff', 'ネイリスト'], ['debug', '動作確認']];
+  let h = `<h1>お店の方の画面</h1><div class="tabs">${tabs.map(t => `<button class="${ui.shopTab === t[0] ? 'on' : ''}" data-act="shopTab" data-t="${t[0]}">${t[1]}</button>`).join('')}</div>`;
+  if (ui.shopTab === 'list') h += renderList();
+  if (ui.shopTab === 'att') h += renderAttendance();
+  if (ui.shopTab === 'menu') h += renderMenus();
+  if (ui.shopTab === 'staff') h += renderStaff();
+  if (ui.shopTab === 'debug') h += renderDebug();
+  return h;
+}
+function renderList() {
+  const f = ui.list; const t = todayYmd();
+  let list = data.bookings.slice();
+  if (f.range === 'future') list = list.filter(b => b.date >= t);
+  if (f.range === 'past') list = list.filter(b => b.date < t);
+  if (f.staff !== 'all') list = list.filter(b => b.staffId === f.staff);
+  if (!f.showCancelled) list = list.filter(b => b.status === 'active');
+  list.sort((a, b) => a.date.localeCompare(b.date) || a.start - b.start);
+  if (f.range === 'past') list.reverse();
+  const active = list.filter(b => b.status === 'active').length;
+  let h = `<div class="card"><div class="filters">
+    <label class="f"><span>期間</span><select id="lf-range">
+      <option value="future" ${f.range === 'future' ? 'selected' : ''}>きょう以降</option>
+      <option value="past" ${f.range === 'past' ? 'selected' : ''}>きのう以前</option>
+      <option value="all" ${f.range === 'all' ? 'selected' : ''}>すべて</option></select></label>
+    <label class="f"><span>ネイリスト</span><select id="lf-staff"><option value="all">全員</option>
+      ${data.staff.map(s => `<option value="${s.id}" ${f.staff === s.id ? 'selected' : ''}>${esc(s.name)}</option>`).join('')}</select></label>
+    <label style="display:flex;gap:6px;align-items:center;padding-bottom:10px"><input type="checkbox" id="lf-cancel" ${f.showCancelled ? 'checked' : ''}> キャンセルも表示</label>
+  </div><p class="muted" style="margin:0">ご予約 ${active} 件</p></div>`;
+  if (!list.length) return h + `<p class="muted">該当するご予約はありません。</p>`;
+  const byDate = {};
+  list.forEach(b => (byDate[b.date] = byDate[b.date] || []).push(b));
+  Object.keys(byDate).forEach(d => {
+    h += `<div class="day-group"><h3>${fmtDate(d)}${d === t ? ' <span class="badge">きょう</span>' : ''}</h3><div class="tbl-wrap"><table>
+      <tr><th>時間</th><th>ネイリスト</th><th>メニュー</th><th>お名前</th><th>お電話</th><th>予約番号</th><th>状態</th></tr>`;
+    byDate[d].forEach(b => {
+      h += `<tr class="${b.status === 'cancelled' ? 'cancelled' : ''}">
+        <td>${hm(b.start)}〜${hm(b.start + b.minutes)}</td><td>${esc(staffName(b.staffId))}</td>
+        <td>${esc(b.menuName)}</td><td>${esc(b.name)} 様</td><td>${esc(fmtPhone(b.phone))}</td><td>${esc(b.id)}</td>
+        <td class="st">${b.status === 'cancelled' ? '<span class="badge gray">キャンセル</span>' : '<span class="badge">ご予約</span>'}</td></tr>`;
+    });
+    h += `</table></div></div>`;
+  });
+  return h;
+}
+function fmtPhone(p) {
+  if (p.length === 11) return `${p.slice(0, 3)}-${p.slice(3, 7)}-${p.slice(7)}`;
+  if (p.length === 10) return `${p.slice(0, 2)}-${p.slice(2, 6)}-${p.slice(6)}`;
+  return p;
+}
+function renderAttendance() {
+  if (!data.staff.length) return `<p class="muted">先に「ネイリスト」のタブで、ネイリストさんを登録してください。</p>`;
+  if (!staffById(ui.attStaff)) ui.attStaff = data.staff[0].id;
+  if (!ui.attMonth) ui.attMonth = monthOf(todayYmd());
+  const s = staffById(ui.attStaff);
+  const cal = calendarHTML(ui.attMonth, ds => {
+    const work = s.workDays.includes(ds);
+    const has = data.bookings.some(b => b.status === 'active' && b.staffId === s.id && b.date === ds);
+    if (ds < todayYmd()) return { disabled: true, sub: work ? '出' : '' };
+    return { cls: work ? 'work' : '', sub: work ? (has ? '出・予' : '出') : '休' };
+  }, monthOf(todayYmd()), null);
+  const ms = fromYmd(ui.attMonth);
+  return `<div class="card">
+    <div class="filters"><label class="f"><span>ネイリスト</span><select id="att-staff">
+      ${data.staff.map(x => `<option value="${x.id}" ${x.id === s.id ? 'selected' : ''}>${esc(x.name)}</option>`).join('')}</select></label></div>
+    <p class="muted">日にちを押すと「出勤」と「お休み」が切りかわります。お客様は「出勤」の日だけ選べます。</p>
+    <div style="max-width:420px">${cal}
+    <div class="legend"><span class="l-work">出勤</span><span class="l-ok">お休み</span><span>「予」…ご予約あり</span></div></div>
+  </div>
+  <div class="card"><h2>${ms.getMonth() + 1}月の曜日でまとめて決める</h2>
+    <p class="muted">押した曜日を、${ms.getMonth() + 1}月のきょう以降すべて「出勤」または「お休み」にします。</p>
+    <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px">${WD.split('').map((w, i) => `<button class="btn btn-ghost btn-small" data-act="bulkWd" data-wd="${i}" data-on="1">${w}を出勤</button>`).join('')}</div>
+    <div style="display:flex;gap:6px;flex-wrap:wrap">${WD.split('').map((w, i) => `<button class="btn btn-quiet btn-small" data-act="bulkWd" data-wd="${i}" data-on="0">${w}をお休み</button>`).join('')}</div>
+  </div>`;
+}
+function renderMenus() {
+  let h = `<div class="card"><h2>メニュー</h2><p class="muted">名前・かかる時間・料金を変えて「保存」を押してください。料金は仮の金額です。</p>
+    <div class="row-form muted" style="font-size:.82rem"><span>名前</span><span>時間(分)</span><span>料金(円)</span><span></span></div>`;
+  data.menus.forEach(m => {
+    h += `<div class="row-form" data-mid="${m.id}">
+      <input type="text" value="${esc(m.name)}" data-k="name">
+      <select data-k="minutes">${minuteOptions(m.minutes)}</select>
+      <input type="number" min="0" step="100" value="${m.price}" data-k="price">
+      <span style="display:flex;gap:6px"><button class="btn btn-primary btn-small" data-act="saveMenu" data-id="${m.id}">保存</button>
+      <button class="btn btn-quiet btn-small" data-act="delMenu" data-id="${m.id}">削除</button></span></div>`;
+  });
+  h += `</div><div class="card"><h2>メニューを追加する</h2>
+    <div class="row-form" data-mid="new">
+      <input type="text" placeholder="メニューの名前" data-k="name">
+      <select data-k="minutes">${minuteOptions(60)}</select>
+      <input type="number" min="0" step="100" placeholder="料金" data-k="price">
+      <button class="btn btn-primary btn-small" data-act="addMenu">追加</button></div>
+    <p class="muted">すでに入っているご予約は、予約したときのメニューの内容のまま残ります。</p></div>`;
+  return h;
+}
+function minuteOptions(sel) {
+  let o = '';
+  for (let m = 30; m <= 240; m += 15) o += `<option value="${m}" ${m === sel ? 'selected' : ''}>${m}分</option>`;
+  return o;
+}
+function renderStaff() {
+  let h = `<div class="card"><h2>ネイリスト</h2>`;
+  data.staff.forEach(s => {
+    const used = data.bookings.some(b => b.staffId === s.id && b.status === 'active');
+    h += `<div class="row-form" style="grid-template-columns:1fr auto" data-sid="${s.id}">
+      <input type="text" value="${esc(s.name)}" data-k="name">
+      <span style="display:flex;gap:6px"><button class="btn btn-primary btn-small" data-act="saveStaff" data-id="${s.id}">保存</button>
+      <button class="btn btn-quiet btn-small" data-act="delStaff" data-id="${s.id}" ${used ? 'disabled title="ご予約があるため削除できません"' : ''}>削除</button></span></div>`;
+  });
+  h += `<p class="muted">ご予約が入っているネイリストさんは削除できません。</p></div>
+  <div class="card"><h2>ネイリストを追加する</h2>
+    <div class="row-form" style="grid-template-columns:1fr auto" data-sid="new">
+      <input type="text" placeholder="お名前" data-k="name">
+      <button class="btn btn-primary btn-small" data-act="addStaff">追加</button></div>
+    <p class="muted">追加したら「出勤日」のタブで出勤する日を決めてください。</p></div>`;
+  return h;
+}
+function renderDebug() {
+  const v = data.debugNow ? data.debugNow.slice(0, 16) : '';
+  return `<div class="card"><h2>いまの日時を変えて試す</h2>
+    <p class="muted">「前日18時をすぎるとキャンセルできない」などを確かめるための機能です。ここで決めた日時を「いま」として動きます。</p>
+    <label class="f"><span>いまの日時</span><input type="datetime-local" id="dbg-now" value="${v}"></label>
+    <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn btn-primary btn-small" data-act="setNow">この日時にする</button>
+    <button class="btn btn-quiet btn-small" data-act="clearNow">本当の日時に戻す</button></div>
+    <div class="note">試し方の例:予約一覧で、ある予約の日にちを見ます。その前の日の 17:59 にすると、お客様の画面からキャンセルできます。18:00 にすると、やさしいご案内が出てキャンセルできなくなります。</div>
+  </div>
+  <div class="card"><h2>見本のデータに戻す</h2>
+    <p class="muted">入っている予約・メニュー・出勤日をすべて消して、最初の見本の状態に戻します。見本のお客様の名前と電話番号は作り物です。</p>
+    <button class="btn btn-quiet btn-small" data-act="reset">見本のデータに戻す</button></div>`;
+}
+
+/* ===== 操作 ===== */
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.innerHTML = `<div class="toast">${esc(msg)}</div>`;
+  clearTimeout(toast._t); toast._t = setTimeout(() => { el.innerHTML = ''; }, 2600);
+}
+function go(page) { ui.page = page; render(); window.scrollTo(0, 0); }
+function readRow(sel) {
+  const row = document.querySelector(sel); const o = {};
+  row.querySelectorAll('[data-k]').forEach(i => { o[i.dataset.k] = i.value; });
+  return o;
+}
+
+const ACT = {
+  view: d => { ui.view = d.v; render(); window.scrollTo(0, 0); },
+  home: () => { ui.bk = {}; ui.confirmCancel = false; go('home'); },
+  startBook: () => { ui.bk = {}; ui.step = 1; ui.form = { name: '', phone: '' }; ui.errors = {}; go('book'); },
+  goLookup: () => { ui.lookup.err = ''; go('lookup'); },
+  pickStaff: d => {
+    if (ui.bk.staffId !== d.id) ui.bk = { staffId: d.id, menuId: ui.bk.menuId };
+    ui.step = 2; go('book');
+  },
+  pickMenu: d => {
+    if (ui.bk.menuId !== d.id) { ui.bk.date = null; ui.bk.start = null; }
+    ui.bk.menuId = d.id; ui.step = 3; go('book');
+  },
+  calmonth: d => {
+    if (ui.view === 'shop') ui.attMonth = shiftMonth(ui.attMonth, +d.d);
+    else ui.bk.month = shiftMonth(ui.bk.month, +d.d);
+    render();
+  },
+  calday: d => {
+    if (ui.view === 'shop') return toggleWork(d.date);
+    ui.bk.date = d.date; ui.bk.start = null; render();
+  },
+  pickTime: d => { ui.bk.start = +d.t; render(); },
+  step: d => { saveFormInputs(); ui.step = +d.s; ui.errors = {}; go('book'); },
+  submitBook: () => {
+    saveFormInputs();
+    const e = {};
+    if (!ui.form.name.trim()) e.name = 'お名前をご入力ください。';
+    const ph = normPhone(ui.form.phone);
+    if (!/^0\d{9,10}$/.test(ph)) e.phone = 'お電話番号を、数字10けたか11けたでご入力ください。';
+    ui.errors = e;
+    if (Object.keys(e).length) return render();
+    const b = ui.bk, m = menuById(b.menuId);
+    if (!slotsFor(b.staffId, b.date, m.minutes).find(x => x.t === b.start && x.ok)) {
+      toast('申し訳ありません、そのお時間はご予約が埋まってしまいました。別のお時間をお選びください。');
+      ui.step = 3; ui.bk.start = null; return go('book');
+    }
+    const no = newBookingNo();
+    data.bookings.push({ id: no, staffId: b.staffId, menuId: m.id, menuName: m.name, minutes: m.minutes, price: m.price,
+      date: b.date, start: b.start, name: ui.form.name.trim(), phone: ph, status: 'active', createdAt: new Date().toISOString() });
+    persist();
+    ui.doneId = no; ui.doneKind = 'new'; ui.bk = {}; go('done');
+  },
+  doLookup: () => {
+    const no = document.getElementById('l-no').value.trim().toUpperCase().replace(/[Ｎｎ]/g, 'N');
+    const noD = normPhone(no);
+    const ph = normPhone(document.getElementById('l-phone').value);
+    ui.lookup.no = document.getElementById('l-no').value; ui.lookup.phone = document.getElementById('l-phone').value;
+    const b = data.bookings.find(x => (x.id === no || x.id === 'N' + noD) && x.phone === ph);
+    if (!b) { ui.lookup.err = 'ご予約が見つかりませんでした。お手数ですが、予約番号とお電話番号をもう一度ご確認ください。'; return render(); }
+    ui.lookup.err = ''; ui.manageId = b.id; ui.confirmCancel = false; go('manage');
+  },
+  cancelAsk: () => { ui.confirmCancel = true; render(); },
+  cancelNo: () => { ui.confirmCancel = false; render(); },
+  cancelYes: () => {
+    const b = data.bookings.find(x => x.id === ui.manageId);
+    ui.confirmCancel = false;
+    if (!canChange(b)) return render();
+    b.status = 'cancelled'; b.cancelledAt = new Date().toISOString(); persist();
+    toast('ご予約をキャンセルいたしました。');
+    render();
+  },
+  startChange: () => {
+    const b = data.bookings.find(x => x.id === ui.manageId);
+    if (!canChange(b)) return render();
+    ui.bk = { staffId: b.staffId, menuId: b.menuId, editingId: b.id, date: null, start: null, month: monthOf(b.date < todayYmd() ? todayYmd() : b.date) };
+    // メニューが削除・変更されていても、予約時の時間で空きを調べる
+    if (!menuById(b.menuId) || menuById(b.menuId).minutes !== b.minutes) {
+      ui.bk.menuId = '__booking__';
+    }
+    ui.step = 3; go('book');
+  },
+  backToManage: () => { ui.bk = {}; go('manage'); },
+  submitChange: () => {
+    const b = data.bookings.find(x => x.id === ui.bk.editingId);
+    if (!canChange(b)) { ui.bk = {}; return go('manage'); }
+    if (!slotsFor(b.staffId, ui.bk.date, b.minutes, b.id).find(x => x.t === ui.bk.start && x.ok)) {
+      toast('申し訳ありません、そのお時間はご予約が埋まってしまいました。別のお時間をお選びください。');
+      ui.step = 3; ui.bk.start = null; return go('book');
+    }
+    b.date = ui.bk.date; b.start = ui.bk.start; b.changedAt = new Date().toISOString(); persist();
+    ui.doneId = b.id; ui.doneKind = 'change'; ui.bk = {}; go('done');
+  },
+
+  shopTab: d => { ui.shopTab = d.t; render(); },
+  bulkWd: d => {
+    const s = staffById(ui.attStaff); const ms = fromYmd(ui.attMonth);
+    const y = ms.getFullYear(), m = ms.getMonth(), n = new Date(y, m + 1, 0).getDate();
+    const on = d.on === '1'; let skipped = 0;
+    for (let i = 1; i <= n; i++) {
+      const dt = new Date(y, m, i); const ds = ymd(dt);
+      if (dt.getDay() !== +d.wd || ds < todayYmd()) continue;
+      if (on) { if (!s.workDays.includes(ds)) s.workDays.push(ds); }
+      else {
+        if (data.bookings.some(b => b.status === 'active' && b.staffId === s.id && b.date === ds)) { skipped++; continue; }
+        s.workDays = s.workDays.filter(x => x !== ds);
+      }
+    }
+    persist(); render();
+    toast(skipped ? `ご予約が入っている${skipped}日は、出勤のままにしました。` : '出勤日を更新しました。');
+  },
+  saveMenu: d => {
+    const v = readRow(`[data-mid="${d.id}"]`); const m = menuById(d.id);
+    if (!v.name.trim()) return toast('メニューの名前を入れてください。');
+    m.name = v.name.trim(); m.minutes = +v.minutes; m.price = Math.max(0, +v.price || 0);
+    persist(); render(); toast('メニューを保存しました。');
+  },
+  delMenu: d => {
+    const m = menuById(d.id);
+    if (!confirm(`「${m.name}」を削除しますか?(入っているご予約はそのまま残ります)`)) return;
+    data.menus = data.menus.filter(x => x.id !== d.id); persist(); render(); toast('メニューを削除しました。');
+  },
+  addMenu: () => {
+    const v = readRow('[data-mid="new"]');
+    if (!v.name.trim()) return toast('メニューの名前を入れてください。');
+    data.menus.push({ id: 'm' + Date.now(), name: v.name.trim(), minutes: +v.minutes, price: Math.max(0, +v.price || 0) });
+    persist(); render(); toast('メニューを追加しました。');
+  },
+  saveStaff: d => {
+    const v = readRow(`[data-sid="${d.id}"]`);
+    if (!v.name.trim()) return toast('お名前を入れてください。');
+    staffById(d.id).name = v.name.trim(); persist(); render(); toast('保存しました。');
+  },
+  delStaff: d => {
+    const s = staffById(d.id);
+    if (!confirm(`「${s.name}」さんを削除しますか?`)) return;
+    data.staff = data.staff.filter(x => x.id !== d.id); persist(); render(); toast('削除しました。');
+  },
+  addStaff: () => {
+    const v = readRow('[data-sid="new"]');
+    if (!v.name.trim()) return toast('お名前を入れてください。');
+    const id = 's' + Date.now();
+    data.staff.push({ id, name: v.name.trim(), workDays: [] }); ui.attStaff = id;
+    persist(); render(); toast('追加しました。「出勤日」のタブで出勤日を決めてください。');
+  },
+  setNow: () => {
+    const v = document.getElementById('dbg-now').value;
+    if (!v) return toast('日時を入れてください。');
+    data.debugNow = v; persist(); render(); toast('いまの日時を変えました。');
+  },
+  clearNow: () => { data.debugNow = null; persist(); render(); toast('本当の日時に戻しました。'); },
+  reset: () => {
+    if (!confirm('入っている予約などをすべて消して、見本のデータに戻しますか?')) return;
+    data = seed(); persist(); ui.attStaff = null; ui.attMonth = null; render(); toast('見本のデータに戻しました。');
+  },
+};
+
+function toggleWork(ds) {
+  const s = staffById(ui.attStaff);
+  if (s.workDays.includes(ds)) {
+    const n = data.bookings.filter(b => b.status === 'active' && b.staffId === s.id && b.date === ds).length;
+    if (n && !confirm(`この日は ${n} 件のご予約が入っています。お休みにしても、入っているご予約は消えません。お休みにしますか?`)) return;
+    s.workDays = s.workDays.filter(x => x !== ds);
+  } else s.workDays.push(ds);
+  persist(); render();
+}
+function saveFormInputs() {
+  const n = document.getElementById('f-name'), p = document.getElementById('f-phone');
+  if (n) ui.form.name = n.value;
+  if (p) ui.form.phone = p.value;
+}
+
+document.addEventListener('click', e => {
+  const el = e.target.closest('[data-act]');
+  if (!el || el.disabled) return;
+  const fn = ACT[el.dataset.act];
+  if (fn) { e.preventDefault(); fn(el.dataset, el); }
+});
+document.addEventListener('change', e => {
+  const id = e.target.id;
+  if (id === 'lf-range') { ui.list.range = e.target.value; render(); }
+  if (id === 'lf-staff') { ui.list.staff = e.target.value; render(); }
+  if (id === 'lf-cancel') { ui.list.showCancelled = e.target.checked; render(); }
+  if (id === 'att-staff') { ui.attStaff = e.target.value; render(); }
+});
+document.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && (e.target.id === 'l-no' || e.target.id === 'l-phone')) ACT.doLookup();
+});
+window.addEventListener('storage', () => { data = load(); render(); });
+
+render();
+</script>
+</body>
+</html>
