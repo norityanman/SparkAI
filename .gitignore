@@ -1,0 +1,21 @@
+# Work and test output
+ads/video/work/
+ads/video/out/
+*.wav
+__pycache__/
+*.pyc
+
+# Node
+node_modules/
+package-lock.json
+
+# Fonts and external source footage are not stored in the repo
+fonts/
+*.ttf
+*.otf
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
