@@ -299,15 +299,13 @@ const staffName = id => (staffById(id) || { name: '(登録なし)' }).name;
 
 function slotsFor(staffId, date, minutes, excludeId) {
   const busy = data.bookings.filter(b => b.status === 'active' && b.staffId === staffId && b.date === date && b.id !== excludeId);
-  const n = now();
-  const isToday = date === ymd(n);
-  const nowMin = n.getHours() * 60 + n.getMinutes();
+  const closed = isClosed(date);
   const out = [];
   for (let t = OPEN_MIN; t < CLOSE_MIN; t += STEP_MIN) {
     let ok = true;
-    if (t + minutes > CLOSE_MIN) ok = false;                                         // メニューの時間が入りきらない
+    if (closed) ok = false;                                                          // 前日18時をすぎて受付終了
+    else if (t + minutes > CLOSE_MIN) ok = false;                                         // メニューの時間が入りきらない
     else if (busy.some(b => t < b.start + b.minutes && b.start < t + minutes)) ok = false; // すでに予約がある
-    else if (isToday && t <= nowMin) ok = false;                                     // もうすぎた時間
     out.push({ t, ok });
   }
   return out;
@@ -315,9 +313,12 @@ function slotsFor(staffId, date, minutes, excludeId) {
 function dayStatus(staffId, date, minutes, excludeId) {
   const s = staffById(staffId);
   if (date < todayYmd() || date > lastYmd()) return 'out';
+  if (isClosed(date)) return 'closed';
   if (!s || !s.workDays.includes(date)) return 'off';
   return slotsFor(staffId, date, minutes, excludeId).some(x => x.ok) ? 'ok' : 'full';
 }
+// 予約日の前日18時をすぎたら、その日の新しいご予約・日にちの変更は受けつけない
+function isClosed(date) { return now() >= deadlineOf({ date }); }
 function deadlineOf(b) { const d = addDays(fromYmd(b.date), -1); d.setHours(DEADLINE_HOUR, 0, 0, 0); return d; }
 function canChange(b) { return b.status === 'active' && now() < deadlineOf(b); }
 function isPast(b) { const end = fromYmd(b.date); end.setMinutes(b.start + b.minutes); return now() >= end; }
@@ -451,6 +452,7 @@ function renderBook() {
       if (st === 'ok') return { cls: b.date === ds ? 'on' : '', sub: '○', title: 'ご予約いただけます' };
       if (st === 'full') return { disabled: true, sub: '満', title: 'ご予約がいっぱいです' };
       if (st === 'off') return { disabled: true, sub: '休', title: 'お休みの日です' };
+      if (st === 'closed') return { disabled: true, sub: '終', title: '前日18時をすぎたため、受付を終了しました' };
       return { disabled: true };
     }, monthOf(todayYmd()), lastYmd());
     let slots = `<p class="muted">左のカレンダーから、日にちをお選びください。</p>`;
@@ -460,8 +462,9 @@ function renderBook() {
         list.map(x => `<button class="slot ${b.start === x.t ? 'on' : ''}" data-act="pickTime" data-t="${x.t}" ${x.ok ? '' : 'disabled'}>${hm(x.t)}</button>`).join('') +
         `</div><p class="muted" style="margin-top:8px">線が引かれたお時間は、ご予約が入っているか、メニューのお時間(${m.minutes}分)が営業時間内におさまらないため、お選びいただけません。</p>`;
     }
-    h += summaryHTML() + `<div class="card"><h2>日にちとお時間をお選びください</h2><div class="cols"><div>${cal}
-      <div class="legend"><span class="l-ok">選べます</span><span class="l-no">選べません(休・満)</span><span class="l-on">選んだ日</span></div></div>
+    h += summaryHTML() + `<div class="card"><h2>日にちとお時間をお選びください</h2>
+      <p class="muted">Webでのご予約は、<b>ご予約日の前日18時まで</b>承っております。それより後のご予約は、お手数ですがお店までお電話でご連絡いただけますか。</p><div class="cols"><div>${cal}
+      <div class="legend"><span class="l-ok">選べます</span><span class="l-no">選べません(休・満・終=受付終了)</span><span class="l-on">選んだ日</span></div></div>
       <div>${slots}</div></div></div>
       <div class="actions">
         ${b.editingId ? `<button class="btn btn-quiet" data-act="backToManage">変更をやめる</button>` : `<button class="btn btn-quiet" data-act="step" data-s="2">もどる</button>`}
@@ -684,6 +687,11 @@ function renderDebug() {
 }
 
 /* ===== 操作 ===== */
+function slotGoneMsg(date) {
+  return isClosed(date)
+    ? '申し訳ありません、前日18時をすぎたため、その日のご予約は受付を終了いたしました。別の日にちをお選びください。'
+    : '申し訳ありません、そのお時間はご予約が埋まってしまいました。別のお時間をお選びください。';
+}
 function toast(msg) {
   const el = document.getElementById('toast');
   el.innerHTML = `<div class="toast">${esc(msg)}</div>`;
@@ -730,7 +738,7 @@ const ACT = {
     if (Object.keys(e).length) return render();
     const b = ui.bk, m = menuById(b.menuId);
     if (!slotsFor(b.staffId, b.date, m.minutes).find(x => x.t === b.start && x.ok)) {
-      toast('申し訳ありません、そのお時間はご予約が埋まってしまいました。別のお時間をお選びください。');
+      toast(slotGoneMsg(b.date));
       ui.step = 3; ui.bk.start = null; return go('book');
     }
     const no = newBookingNo();
@@ -773,7 +781,7 @@ const ACT = {
     const b = data.bookings.find(x => x.id === ui.bk.editingId);
     if (!canChange(b)) { ui.bk = {}; return go('manage'); }
     if (!slotsFor(b.staffId, ui.bk.date, b.minutes, b.id).find(x => x.t === ui.bk.start && x.ok)) {
-      toast('申し訳ありません、そのお時間はご予約が埋まってしまいました。別のお時間をお選びください。');
+      toast(slotGoneMsg(ui.bk.date));
       ui.step = 3; ui.bk.start = null; return go('book');
     }
     b.date = ui.bk.date; b.start = ui.bk.start; b.changedAt = new Date().toISOString(); persist();
