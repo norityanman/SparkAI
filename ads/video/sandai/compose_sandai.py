@@ -44,12 +44,19 @@ T = [
 ]
 
 # ---------- 1) voices removed per source, then cut segments (video + SFX audio) ----------
+# A: everything except voices. B and C carry generated background music (sustained tones + bass), so only
+# the "drums" stem is kept there — it holds the short sound effects (taps, steps, clicks).
+SFX_STEM = {"A": "no_vocals", "B": "drums", "C": "drums"}
 sfx_src = {}
 for k, p in SRC.items():
     wav = WORK / f"src{k}.wav"
     run("ffmpeg", "-hide_banner", "-loglevel", "error", "-y", "-i", p, "-vn", "-ac", "2", "-ar", "44100", str(wav))
-    run(sys.executable, "-m", "demucs", "-n", "htdemucs", "--two-stems=vocals", "-d", "cpu", "-o", str(WORK / "sep"), str(wav))
-    sfx_src[k] = WORK / "sep" / "htdemucs" / f"src{k}" / "no_vocals.wav"
+    if SFX_STEM[k] == "no_vocals":
+        run(sys.executable, "-m", "demucs", "-n", "htdemucs", "--two-stems=vocals", "-d", "cpu", "-o", str(WORK / "sep"), str(wav))
+        sfx_src[k] = WORK / "sep" / "htdemucs" / f"src{k}" / "no_vocals.wav"
+    else:
+        run(sys.executable, "-m", "demucs", "-n", "htdemucs", "-d", "cpu", "-o", str(WORK / "sep4"), str(wav))
+        sfx_src[k] = WORK / "sep4" / "htdemucs" / f"src{k}" / f"{SFX_STEM[k]}.wav"
 
 lengths = [b - a for _, a, b in SEGS]
 starts = [0.0]
