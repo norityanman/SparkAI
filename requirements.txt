@@ -1,0 +1,5 @@
+# Python libraries for the SparkAI ad video scripts (ads/video/)
+numpy>=1.24
+Pillow>=10.0
+# Only needed for riku/compose_final.py (removes voices from generated clips). Large download.
+demucs>=4.0

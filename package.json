@@ -1,0 +1,13 @@
+{
+  "name": "sparkai-ads",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Renders the animated SparkAI ad scenes (ads/video/*/scenes.html) to video with Playwright",
+  "scripts": {
+    "render:riku": "node ads/video/riku/render.js",
+    "render:young": "node ads/video/young/render.js"
+  },
+  "dependencies": {
+    "playwright": "^1.48.0"
+  }
+}
