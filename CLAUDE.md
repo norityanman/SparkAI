@@ -1,82 +1,93 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+このファイルは、このリポジトリで作業する Claude Code（claude.ai/code）への案内です。
 
-## What this repository is
+## このリポジトリについて
 
-Marketing material for **株式会社ReFast** and its service **SparkAI** (DX support, system building, AI training for small and mid-sized companies). There is no application to build or test. The repo holds:
+**株式会社ReFast** のサービス **SparkAI** の広告素材をまとめたリポジトリです。SparkAIは、中小企業向けのDX支援・システム構築・AI人材教育のサービスです。ビルドやテストをするアプリはありません。中身は次の3つです。
 
-- `ads/*.md`: ad story concepts, written in Japanese. Each one follows the same arc: 悩み → SNSで知る → クリック → 相談 → 学ぶ → 成功体験 → 輝かしい未来. Each has a 60s scene table with telops, a 15s cut, and notes.
-- `ads/storyboard.html`: a storyboard page that was published as an Artifact.
-- `ads/video/`: scripts that turn AI-generated anime clips (supplied by the user) into finished vertical SNS ads, plus the rendered `.mp4` outputs.
+- `ads/*.md`：広告ストーリーの案（日本語）
+  - 流れはどれも同じで、「悩み → SNSで知る → クリック → 相談 → 学ぶ → 成功体験 → 輝かしい未来」です。
+  - 60秒の場面とテロップの表、15秒版、注意点が入っています。
+- `ads/storyboard.html`：絵コンテのページ（Artifactとして公開したもの）。
+- `ads/video/`：ユーザーが動画生成AIで作ったアニメ素材を、SNS用の縦型広告に仕上げるスクリプトと、書き出した `.mp4`。
 
-Main copy: 「人が足りないなら、人を伸ばせばいい。」. Always use the brand names exactly as written: 株式会社ReFast and SparkAI.
+メインコピーは「人が足りないなら、人を伸ばせばいい。」です。社名は「株式会社ReFast」、サービス名は「SparkAI」と、表記を変えずに使います。
 
-## Video pipeline (ads/video)
+## 動画の作り方（ads/video）
 
-Each episode has its own `compose_*.py` (for example `riku/compose_final.py`, `megumi/compose_megumi.py`, `sandai/compose_sandai.py`, `hinano/compose_hinano.py`). They are standalone Python scripts with the same shape:
+話ごとに `compose_*.py` があります（例：`riku/compose_final.py`、`megumi/compose_megumi.py`、`sandai/compose_sandai.py`、`hinano/compose_hinano.py`）。どれも単独で動くPythonスクリプトで、処理の流れは共通です。
 
-1. **Audio, sound effects only.** Demucs (`python3 -m demucs -n htdemucs`) separates the clip's audio.
-   - Use `--two-stems=vocals` and keep `no_vocals.wav` when only voices must go.
-   - When the generated clip also contains music, run the 4-stem mode and keep only `drums.wav`, which holds the short sound effects (see `SFX_STEM` in `sandai/compose_sandai.py`).
-2. **Telops.** A Python list `T` of `(start, end, lines, style)` is written to an ASS file and burned in with ffmpeg's `ass` filter.
-   - Times are relative to the clip, or to the segment when several clips are joined.
-3. **End card.** PIL draws transparent layers that fade in one after another, in this order:
-   - the SparkAI logo
-   - the copy
-   - an orange 「無料相談 30分」 pill and 「プロフィールのリンクから」
-   - the ReFast logo with 「株式会社ReFast」
+1. **音（効果音だけにする）**：Demucs（`python3 -m demucs -n htdemucs`）で素材の音を分ける。
+   - 声だけを消すときは `--two-stems=vocals` で分け、`no_vocals.wav` を使う。
+   - 素材に音楽も入っているときは4つに分け、短い効果音が入る `drums.wav` だけを残す（`sandai/compose_sandai.py` の `SFX_STEM` を参照）。
+2. **テロップ**：`(開始秒, 終了秒, 行のリスト, スタイル)` のリスト `T` からASSファイルを作り、ffmpegの `ass` フィルターで焼き込む。
+   - 秒は素材の頭からの時間。複数の素材をつなぐ場合は、各区間の頭からの時間。
+3. **エンドカード**：PILで透明なレイヤーを作り、順にふわっと表示させる。順番は次のとおり。
+   1. SparkAIのロゴ
+   2. コピー
+   3. オレンジ色の「無料相談 30分」ボタンと「プロフィールのリンクから」
+   4. ReFastのロゴと「株式会社ReFast」
    
-   A small synthesized "sparkle" chime plays when the logo appears.
-4. **One ffmpeg `filter_complex`** does all of this:
-   - trim and reorder segments
-   - join them with `xfade` and `acrossfade`
-   - overlay the telops
-   - add the end card
-   - mix the audio, then `loudnorm` and `alimiter`
+   ロゴが出るときに、合成した小さな「キラッ」という音を入れる。
+4. **ffmpegの `filter_complex` 1本**で、次の処理をまとめて行う。
+   - 区間の切り出しと並べ替え
+   - `xfade` と `acrossfade` によるつなぎ
+   - テロップの重ね合わせ
+   - エンドカードの追加
+   - 音の合成と、`loudnorm` と `alimiter` による音量調整
 
-Run a script like this:
+実行のしかた：
 ```bash
-python3 ads/video/<episode>/compose_<episode>.py <clips...> <sparkai_logo.jpg> ads/video/video_src/refast_logo.png <fonts_dir> <work_dir> ads/video/<output>.mp4
+python3 ads/video/<話>/compose_<話>.py <素材...> <SparkAIロゴ.jpg> ads/video/video_src/refast_logo.png <フォントのフォルダ> <作業用フォルダ> ads/video/<出力>.mp4
 ```
-Each script's docstring gives its exact argument order.
+引数の正確な順番は、各スクリプトの先頭の説明に書いてあります。
 
-Other scripts:
-- `young/` and `riku/`: animations drawn in code, used when no generated clips exist. `scenes.html` draws each frame on a canvas, `render.js` uses Playwright to grab frames and pipe them to ffmpeg, `make_audio.py` synthesizes BGM and sound effects with numpy, and `compose_*.py` adds telops and the end card.
-- `make_bgm*.py`: original piano BGM synthesized with numpy, timed to each video's scenes. Use these only when BGM is requested.
-- `video_src/`: assets from an earlier, separate pipeline (Noto Sans telop `.ass` files, `bgm*.py`, `refast_logo.png`).
+ほかのスクリプト：
+- `young/` と `riku/`：素材がないときに、コードで描いたアニメを作る仕組み。
+  - `scenes.html` がキャンバスに各コマを描く。
+  - `render.js` がPlaywrightで1コマずつ撮影し、ffmpegに渡す。
+  - `make_audio.py` がnumpyでBGMと効果音を合成する。
+  - `compose_*.py` がテロップとエンドカードを付ける。
+- `make_bgm*.py`：numpyで合成した、オリジナルのピアノBGM。各動画の場面に合わせてある。BGMを頼まれたときだけ使う。
+- `video_src/`：別の作り方で作った以前の素材（Noto Sansのテロップ用 `.ass`、`bgm*.py`、`refast_logo.png`）。
 
-### Environment requirements
-- `ffmpeg` with libass, numpy, and Pillow are needed. Node Playwright is preinstalled.
-- Fonts: Zen Kaku Gothic New Black/Bold TTFs, downloaded from `raw.githubusercontent.com/google/fonts/main/ofl/zenkakugothicnew/` into a scratch fonts dir. They are not committed.
-- Demucs: install with `pip install demucs`. PyTorch from PyPI works. The first run downloads the model from `dl.fbaipublicfiles.com`, which must be allowed by the environment's network settings.
-- The SparkAI logo (`2e733742-image.jpg`) comes from the user's uploads and is passed in as an argument. The user declined copying it into the repo, so do not commit it.
+### 必要な環境
+- libass付きの `ffmpeg`、numpy、Pillowが必要。Node版のPlaywrightは最初から入っている。
+- フォント：Zen Kaku Gothic New の Black と Bold のTTF。`raw.githubusercontent.com/google/fonts/main/ofl/zenkakugothicnew/` から作業用のフォントフォルダにダウンロードする。リポジトリには入れない。
+- Demucs：`pip install demucs` で入れる（PyTorchはPyPIからで動く）。初回はモデルを `dl.fbaipublicfiles.com` からダウンロードするので、環境のネットワーク設定でこの接続先を許可しておく。
+- SparkAIのロゴ（`2e733742-image.jpg`）は、ユーザーがアップロードしたものを引数で渡す。リポジトリへのコピーはユーザーに断られたので、コミットしない。
 
-### House style for videos
-- Output is vertical 1080×1920, 30fps, H.264 CRF 18, AAC 192k, `+faststart`.
-- 16:9 clips go on a blurred background with the telops below the picture (see `megumi/compose_megumi.py`).
-- Telop ASS style: Zen Kaku Gothic New Black, size about 84–90 at PlayRes 1080×1920, white text with a navy outline (`&H002B2015`), outline 8, shadow 4, `\an2\pos(540,1340)`. At most 2 lines and about 13 characters per line, with a 0.15–0.2s fade. Use a small `N` style for notes such as 「※イメージです」, which must accompany any illustrative number.
-- Audio:
-  - Voices and generated BGM are removed and sound effects kept, unless the user asks for BGM.
-  - Use `loudnorm=I=-16:TP=-1.5` followed by `alimiter=limit=0.7`. A limit of 0.84 still clipped after AAC encoding.
-- Keep only anime-looking footage. Cut live-action-looking shots, and also cut shots that repeat scenes from another clip. If shots must stay, unify them with the `ANIME` filter in `hinano/compose_hinano.py`: three `bilateral` passes, then multiply-blended edge lines in `gbrp`, then a shared grade.
+### 動画の決まりごと
+- 書き出し：縦型 1080×1920、30fps、H.264 CRF 18、AAC 192k、`+faststart`。
+- 横長（16:9）の素材は、ぼかした背景の上に置き、テロップは映像の下に入れる（`megumi/compose_megumi.py` を参照）。
+- テロップのASSスタイル：
+  - フォントは Zen Kaku Gothic New Black。大きさは84〜90（PlayRes 1080×1920 のとき）。
+  - 白文字に濃紺の縁取り（`&H002B2015`）。縁取り8、影4。
+  - 位置は `\an2\pos(540,1340)`。
+  - 2行まで、1行あたり13文字くらいまで。表示は0.15〜0.2秒のフェード。
+  - 「※イメージです」などの注記は、小さい `N` スタイルで入れる。仮の数字には必ずこの注記を付ける。
+- 音：
+  - ユーザーにBGMを頼まれない限り、声と生成AIのBGMは消して、効果音だけを残す。
+  - 音量は `loudnorm=I=-16:TP=-1.5` のあとに `alimiter=limit=0.7` をかける。0.84ではAACに書き出したあとで音割れした。
+- 映像はアニメの見た目の部分だけを使う。実写っぽい場面や、ほかの素材と内容がかぶる場面はカットする。どうしても残す場合は、`hinano/compose_hinano.py` の `ANIME` フィルターで見た目をそろえる（`bilateral` を3回、`gbrp` で輪郭線を乗算、共通の色調整）。
 
-### Pitfalls seen when editing the filter graphs
-- Find real cut points with timestamped contact sheets (`fps=2,drawtext=...%{pts},tile=`). Scene-detection timestamps alone have placed telops on the wrong shot.
-- `xfade` needs matching timebases. Add `settb=1/30` after `concat` or `overlay`.
-- Filter labels must be unique across the whole graph. Shot-processing labels once collided with the end card's `[e1]`.
-- `blend` on mixed pixel formats turns the image green. Convert both inputs to `gbrp` first.
-- AI-generated clips can contain glitches, such as a phone floating with no hand. Remove them by trimming the clip and dissolving over the gap (`CUTS` in `riku/compose_final.py`), then shift the telops to match.
+### フィルターを編集するときの注意点
+- 場面が切り替わる位置は、秒数入りのコマ一覧（`fps=2,drawtext=...%{pts},tile=`）で確かめる。シーン検出の秒数だけで決めたら、テロップが1場面ずれたことがある。
+- `xfade` は入力どうしのタイムベースがそろっていないと動かない。`concat` や `overlay` のあとに `settb=1/30` を入れる。
+- フィルターのラベル名は、グラフ全体で重ならないようにする。場面加工のラベルが、エンドカードの `[e1]` とぶつかったことがある。
+- 画素形式が違うまま `blend` すると画面が緑になる。先に両方を `gbrp` にそろえる。
+- 生成AIの素材には崩れがある（例：手がないのにスマホが宙に浮いている）。その区間を切り取り、前後をディゾルブでつないで消す（`riku/compose_final.py` の `CUTS` を参照）。切ったぶん、テロップの秒もずらす。
 
-### Checking a render
-- Contact sheet: `ffmpeg -i out.mp4 -vf "fps=1/2,scale=150:267,tile=13x2" -frames:v 1 sheet.png`, then view the image.
-- Duration and streams: `ffprobe`. Peak level: `volumedetect` (should be below 0 dB).
-- Claude cannot listen to audio. Tell the user to check the result by ear, and name the time ranges where voices or music were removed.
+### 書き出したあとの確認
+- コマ一覧を作って目で確認する：`ffmpeg -i out.mp4 -vf "fps=1/2,scale=150:267,tile=13x2" -frames:v 1 sheet.png`
+- 長さと映像・音の有無は `ffprobe`、音量のピークは `volumedetect` で確かめる（0dB未満であること）。
+- Claudeは音を聴けない。どの時間帯の声や音楽を消したかを伝えて、ユーザーに耳で確認してもらう。
 
-## Working with this user
+## このユーザーとの作業
 
-- The user writes in Japanese. Reply in Japanese.
-- When the user asks for a story (「ストーリー考えて」), reply with text only. Do not make a video, and do not save or commit the story unless asked. The user once declined a commit of a story file.
-- When the user uploads clips, deliver the edited video with `SendUserFile` and commit it to the working branch.
-- Do not use paid services or sites.
-- The user cannot share Instagram links usefully: instagram.com is not reachable from this environment and needs a login anyway. Ask for screen recordings and screenshots instead.
+- ユーザーは日本語で書くので、日本語で返す。
+- 「ストーリー考えて」と頼まれたら、文字だけで返す。動画は作らない。頼まれない限り、ファイルへの保存やコミットもしない（ストーリーのファイルのコミットを断られたことがある）。
+- 素材の動画がアップロードされたら、編集した動画を `SendUserFile` で送り、作業ブランチにコミットする。
+- お金がかかるサービスやサイトは使わない。
+- インスタのリンクを送られても中身は見られない。この環境からinstagram.comにつながらず、ログインも必要なため。代わりに画面録画とスクリーンショットを送ってもらう。
