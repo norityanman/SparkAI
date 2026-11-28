@@ -2,11 +2,23 @@
 <html lang="ja">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>ネイルのご予約</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ネイルサロン予約</title>
+<meta name="claude:viewport-fit-sides" content="cover">
 <style>
   :root {
     color-scheme: light;
+    --header: #0f9ea8;
+    --on-primary: #ffffff;
+    --accent-text: #0b7a82;
+    --hover: #f6fcfc;
+    --th: #f7fbfb;
+    --err: #b4505a;
+    --sun: #c0646b;
+    --sat: #4f7fb0;
+    --debug-bg: #fff3d6;
+    --debug-text: #7a5520;
+    --overlay: rgba(20, 40, 42, .45);
     --primary: #0f9ea8;
     --primary-dark: #0b7a82;
     --primary-soft: #e3f5f6;
@@ -23,6 +35,24 @@
     --warn-text: #7a5520;
     --radius: 14px;
   }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+    --header: #0d6f76; --on-primary: #ffffff; --accent-text: #74d6dd;
+    --primary: #1597a1; --primary-dark: #0f7d86; --primary-soft: #16383b; --primary-line: #2b5c61;
+    --bg: #0f1a1c; --card: #172426; --text: #e2eced; --muted: #9bb0b2; --line: #2a3b3e;
+    --disabled: #1f2e30; --disabled-text: #5f7578; --hover: #1c2f31; --th: #1a2a2c;
+    --warn-bg: #33291a; --warn-line: #65502d; --warn-text: #f0d3a4; --err: #f08a93;
+    --sun: #e98d93; --sat: #8fb6de; --debug-bg: #3a2f17; --debug-text: #f0d3a4; --overlay: rgba(0, 0, 0, .6);
+    color-scheme: dark;
+  } }
+  :root[data-theme="dark"] {
+    --header: #0d6f76; --on-primary: #ffffff; --accent-text: #74d6dd;
+    --primary: #1597a1; --primary-dark: #0f7d86; --primary-soft: #16383b; --primary-line: #2b5c61;
+    --bg: #0f1a1c; --card: #172426; --text: #e2eced; --muted: #9bb0b2; --line: #2a3b3e;
+    --disabled: #1f2e30; --disabled-text: #5f7578; --hover: #1c2f31; --th: #1a2a2c;
+    --warn-bg: #33291a; --warn-line: #65502d; --warn-text: #f0d3a4; --err: #f08a93;
+    --sun: #e98d93; --sat: #8fb6de; --debug-bg: #3a2f17; --debug-text: #f0d3a4; --overlay: rgba(0, 0, 0, .6);
+    color-scheme: dark;
+  }
   * { box-sizing: border-box; }
   body {
     margin: 0;
@@ -33,13 +63,15 @@
     line-height: 1.7;
   }
   header.site {
-    background: var(--primary);
-    color: #fff;
+    background: var(--header);
+    color: var(--on-primary);
   }
   .site-inner {
     max-width: 880px;
     margin: 0 auto;
-    padding: 14px 16px;
+    padding-block: 14px;
+    padding-left: max(16px, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -50,11 +82,11 @@
   .brand small { display: block; font-size: .75rem; font-weight: 400; opacity: .9; letter-spacing: 0; }
   .view-switch { display: flex; background: rgba(255,255,255,.18); border-radius: 999px; padding: 3px; }
   .view-switch button {
-    border: 0; background: transparent; color: #fff; font: inherit; font-size: .9rem;
+    border: 0; background: transparent; color: var(--on-primary); font: inherit; font-size: .9rem;
     padding: 6px 14px; border-radius: 999px; cursor: pointer;
   }
-  .view-switch button.on { background: #fff; color: var(--primary-dark); font-weight: 700; }
-  main { max-width: 880px; margin: 0 auto; padding: 20px 16px 60px; }
+  .view-switch button.on { background: var(--card); color: var(--accent-text); font-weight: 700; }
+  main { max-width: 880px; margin: 0 auto; padding-block: 20px 60px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
   h1 { font-size: 1.35rem; margin: 4px 0 6px; }
   h2 { font-size: 1.1rem; margin: 0 0 10px; }
   p { margin: 0 0 10px; }
@@ -73,21 +105,21 @@
     padding: 16px; font: inherit; color: inherit; cursor: pointer;
     transition: border-color .15s, background .15s;
   }
-  .choice:hover { border-color: var(--primary-line); background: #fbfefe; }
+  .choice:hover { border-color: var(--primary-line); background: var(--hover); }
   .choice.on { border-color: var(--primary); background: var(--primary-soft); }
   .choice .t { font-weight: 700; font-size: 1.05rem; }
   .choice .s { color: var(--muted); font-size: .9rem; }
   .big-choice { padding: 24px 20px; }
-  .big-choice .t { font-size: 1.15rem; color: var(--primary-dark); }
+  .big-choice .t { font-size: 1.15rem; color: var(--accent-text); }
 
   .btn {
     display: inline-block; border: 0; border-radius: 999px; font: inherit; cursor: pointer;
     padding: 11px 24px; font-weight: 700; text-decoration: none;
   }
-  .btn-primary { background: var(--primary); color: #fff; }
+  .btn-primary { background: var(--primary); color: var(--on-primary); }
   .btn-primary:hover { background: var(--primary-dark); }
   .btn-primary:disabled { background: var(--disabled); color: var(--disabled-text); cursor: not-allowed; }
-  .btn-ghost { background: transparent; color: var(--primary-dark); border: 1.5px solid var(--primary-line); }
+  .btn-ghost { background: transparent; color: var(--accent-text); border: 1.5px solid var(--primary-line); }
   .btn-ghost:hover { background: var(--primary-soft); }
   .btn-quiet { background: transparent; color: var(--muted); border: 1.5px solid var(--line); }
   .btn-small { padding: 5px 14px; font-size: .88rem; }
@@ -99,8 +131,8 @@
     flex: 1 1 0; min-width: 70px; text-align: center; font-size: .8rem; color: var(--muted);
     padding: 6px 4px; border-bottom: 3px solid var(--line);
   }
-  .steps li.done { color: var(--primary-dark); border-color: var(--primary-line); }
-  .steps li.now { color: var(--primary-dark); border-color: var(--primary); font-weight: 700; }
+  .steps li.done { color: var(--accent-text); border-color: var(--primary-line); }
+  .steps li.now { color: var(--accent-text); border-color: var(--primary); font-weight: 700; }
 
   .summary { background: var(--primary-soft); border-radius: 10px; padding: 12px 16px; margin-bottom: 14px; }
   .summary dl { display: grid; grid-template-columns: auto 1fr; gap: 2px 14px; margin: 0; }
@@ -110,50 +142,50 @@
   /* Calendar */
   .cal-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
   .cal-head .m { font-weight: 700; }
-  .cal-nav { border: 1.5px solid var(--line); background: #fff; border-radius: 999px; width: 38px; height: 38px; cursor: pointer; font-size: 1rem; color: var(--primary-dark); }
+  .cal-nav { border: 1.5px solid var(--line); background: var(--card); border-radius: 999px; width: 38px; height: 38px; cursor: pointer; font-size: 1rem; color: var(--accent-text); }
   .cal-nav:disabled { color: var(--disabled-text); cursor: not-allowed; }
   .cal { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
   .cal .wd { text-align: center; font-size: .78rem; color: var(--muted); padding-bottom: 2px; }
-  .cal .wd.sun { color: #c0646b; } .cal .wd.sat { color: #4f7fb0; }
+  .cal .wd.sun { color: var(--sun); } .cal .wd.sat { color: var(--sat); }
   .day {
     aspect-ratio: 1 / 1; border-radius: 10px; border: 1.5px solid var(--primary-line);
-    background: #fff; font: inherit; cursor: pointer; display: flex; flex-direction: column;
+    background: var(--card); font: inherit; cursor: pointer; display: flex; flex-direction: column;
     align-items: center; justify-content: center; padding: 0; color: var(--text); font-size: .95rem;
   }
   .day small { font-size: .62rem; line-height: 1; color: var(--muted); }
   .day:hover:not(:disabled) { background: var(--primary-soft); }
   .day:disabled { background: var(--disabled); border-color: transparent; color: var(--disabled-text); cursor: not-allowed; }
   .day:disabled small { color: var(--disabled-text); }
-  .day.on { background: var(--primary); border-color: var(--primary); color: #fff; }
-  .day.on small { color: #fff; }
+  .day.on { background: var(--primary); border-color: var(--primary); color: var(--on-primary); }
+  .day.on small { color: var(--on-primary); }
   .day.work { background: var(--primary-soft); border-color: var(--primary); }
   .day.today { outline: 2px dashed var(--primary-line); outline-offset: 1px; }
   .day.empty { visibility: hidden; }
   .legend { display: flex; gap: 14px; flex-wrap: wrap; font-size: .82rem; color: var(--muted); margin-top: 8px; }
   .legend span::before { content: ""; display: inline-block; width: 12px; height: 12px; border-radius: 3px; margin-right: 5px; vertical-align: -1px; }
-  .legend .l-ok::before { background: #fff; border: 1.5px solid var(--primary-line); }
+  .legend .l-ok::before { background: var(--card); border: 1.5px solid var(--primary-line); }
   .legend .l-no::before { background: var(--disabled); }
   .legend .l-on::before { background: var(--primary); }
   .legend .l-work::before { background: var(--primary-soft); border: 1.5px solid var(--primary); }
 
   .slots { display: grid; grid-template-columns: repeat(auto-fill, minmax(86px, 1fr)); gap: 8px; }
   .slot {
-    border: 1.5px solid var(--primary-line); background: #fff; border-radius: 10px; padding: 8px 4px;
+    border: 1.5px solid var(--primary-line); background: var(--card); border-radius: 10px; padding: 8px 4px;
     font: inherit; cursor: pointer; color: var(--text);
   }
   .slot:hover:not(:disabled) { background: var(--primary-soft); }
   .slot:disabled { background: var(--disabled); border-color: transparent; color: var(--disabled-text); cursor: not-allowed; text-decoration: line-through; }
-  .slot.on { background: var(--primary); border-color: var(--primary); color: #fff; font-weight: 700; }
+  .slot.on { background: var(--primary); border-color: var(--primary); color: var(--on-primary); font-weight: 700; }
   .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
   @media (max-width: 680px) { .cols { grid-template-columns: 1fr; } }
 
   label.f { display: block; margin-bottom: 12px; }
   label.f span { display: block; font-size: .9rem; color: var(--muted); margin-bottom: 4px; }
   input[type=text], input[type=tel], input[type=number], input[type=datetime-local], select {
-    width: 100%; font: inherit; padding: 10px 12px; border: 1.5px solid var(--line); border-radius: 10px; background: #fff; color: var(--text);
+    width: 100%; font: inherit; padding: 10px 12px; border: 1.5px solid var(--line); border-radius: 10px; background: var(--card); color: var(--text);
   }
   input:focus, select:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-soft); }
-  .err { color: #b4505a; font-size: .88rem; margin-top: 4px; }
+  .err { color: var(--err); font-size: .88rem; margin-top: 4px; }
 
   .note {
     background: var(--primary-soft); border-left: 4px solid var(--primary); border-radius: 8px;
@@ -163,8 +195,8 @@
     background: var(--warn-bg); border: 1px solid var(--warn-line); color: var(--warn-text);
     border-radius: 12px; padding: 14px 16px; margin: 12px 0;
   }
-  .done-no { font-size: 2rem; font-weight: 700; color: var(--primary-dark); letter-spacing: .08em; }
-  .badge { display: inline-block; font-size: .75rem; padding: 1px 10px; border-radius: 999px; background: var(--primary-soft); color: var(--primary-dark); font-weight: 700; }
+  .done-no { font-size: 2rem; font-weight: 700; color: var(--accent-text); letter-spacing: .08em; }
+  .badge { display: inline-block; font-size: .75rem; padding: 1px 10px; border-radius: 999px; background: var(--primary-soft); color: var(--accent-text); font-weight: 700; }
   .badge.gray { background: var(--disabled); color: var(--muted); }
 
   /* Shop */
@@ -173,25 +205,29 @@
     border: 0; background: transparent; font: inherit; padding: 8px 14px; cursor: pointer; color: var(--muted);
     border-bottom: 3px solid transparent; margin-bottom: -1px;
   }
-  .tabs button.on { color: var(--primary-dark); border-color: var(--primary); font-weight: 700; }
+  .tabs button.on { color: var(--accent-text); border-color: var(--primary); font-weight: 700; }
   .filters { display: flex; gap: 10px; flex-wrap: wrap; align-items: end; margin-bottom: 12px; }
   .filters label.f { margin: 0; min-width: 160px; }
   .day-group { margin-bottom: 16px; }
-  .day-group h3 { font-size: 1rem; margin: 0 0 6px; color: var(--primary-dark); }
+  .day-group h3 { font-size: 1rem; margin: 0 0 6px; color: var(--accent-text); }
   .tbl-wrap { overflow-x: auto; }
-  table { width: 100%; border-collapse: collapse; font-size: .92rem; background: #fff; }
+  table { width: 100%; border-collapse: collapse; font-size: .92rem; background: var(--card); }
   th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--line); white-space: nowrap; }
-  th { color: var(--muted); font-weight: 400; font-size: .82rem; background: #fafdfd; }
+  th { color: var(--muted); font-weight: 400; font-size: .82rem; background: var(--th); }
   tr.cancelled td { color: var(--disabled-text); text-decoration: line-through; }
   tr.cancelled td.st { text-decoration: none; }
   .row-form { display: grid; grid-template-columns: 2fr 1fr 1fr auto; gap: 8px; align-items: center; margin-bottom: 8px; }
   @media (max-width: 600px) { .row-form { grid-template-columns: 1fr 1fr; } }
   .toast {
-    position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%);
-    background: var(--primary-dark); color: #fff; padding: 10px 20px; border-radius: 999px;
+    position: fixed; left: 50%; bottom: calc(24px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%);
+    background: var(--primary-dark); color: var(--on-primary); padding: 10px 20px; border-radius: 999px;
     font-size: .92rem; box-shadow: 0 6px 20px rgba(0,0,0,.15); z-index: 10; max-width: calc(100% - 32px);
   }
-  .debug-banner { background: #fff3d6; color: #7a5520; text-align: center; font-size: .85rem; padding: 6px 16px; }
+  .debug-banner { background: var(--debug-bg); color: var(--debug-text); text-align: center; font-size: .85rem; padding: 6px 16px; }
+  .overlay { position: fixed; inset: 0; background: var(--overlay); display: flex; align-items: center; justify-content: center; padding: 16px; z-index: 20; }
+  .dialog { background: var(--card); color: var(--text); border-radius: var(--radius); padding: 20px; max-width: 440px; width: 100%; }
+  .dialog .actions { margin-top: 12px; }
+  button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px solid var(--primary-line); outline-offset: 2px; }
 </style>
 </head>
 <body>
@@ -207,6 +243,7 @@
 <div id="debug"></div>
 <main id="app"></main>
 <div id="toast"></div>
+<div id="dialog"></div>
 
 <script>
 'use strict';
@@ -692,6 +729,14 @@ function slotGoneMsg(date) {
     ? '申し訳ありません、前日18時をすぎたため、その日のご予約は受付を終了いたしました。別の日にちをお選びください。'
     : '申し訳ありません、そのお時間はご予約が埋まってしまいました。別のお時間をお選びください。';
 }
+let pendingConfirm = null;
+function askConfirm(msg, okLabel, onOk) {
+  pendingConfirm = onOk;
+  document.getElementById('dialog').innerHTML = `<div class="overlay"><div class="dialog" role="dialog" aria-modal="true">
+    <p>${esc(msg)}</p><div class="actions end"><button class="btn btn-quiet" data-act="dlgNo">やめる</button>
+    <button class="btn btn-primary" data-act="dlgYes">${esc(okLabel)}</button></div></div></div>`;
+}
+function closeConfirm() { pendingConfirm = null; document.getElementById('dialog').innerHTML = ''; }
 function toast(msg) {
   const el = document.getElementById('toast');
   el.innerHTML = `<div class="toast">${esc(msg)}</div>`;
@@ -813,8 +858,9 @@ const ACT = {
   },
   delMenu: d => {
     const m = menuById(d.id);
-    if (!confirm(`「${m.name}」を削除しますか?(入っているご予約はそのまま残ります)`)) return;
-    data.menus = data.menus.filter(x => x.id !== d.id); persist(); render(); toast('メニューを削除しました。');
+    askConfirm(`「${m.name}」を削除しますか?(入っているご予約はそのまま残ります)`, '削除する', () => {
+      data.menus = data.menus.filter(x => x.id !== d.id); persist(); render(); toast('メニューを削除しました。');
+    });
   },
   addMenu: () => {
     const v = readRow('[data-mid="new"]');
@@ -829,8 +875,9 @@ const ACT = {
   },
   delStaff: d => {
     const s = staffById(d.id);
-    if (!confirm(`「${s.name}」さんを削除しますか?`)) return;
-    data.staff = data.staff.filter(x => x.id !== d.id); persist(); render(); toast('削除しました。');
+    askConfirm(`「${s.name}」さんを削除しますか?`, '削除する', () => {
+      data.staff = data.staff.filter(x => x.id !== d.id); persist(); render(); toast('削除しました。');
+    });
   },
   addStaff: () => {
     const v = readRow('[data-sid="new"]');
@@ -845,9 +892,12 @@ const ACT = {
     data.debugNow = v; persist(); render(); toast('いまの日時を変えました。');
   },
   clearNow: () => { data.debugNow = null; persist(); render(); toast('本当の日時に戻しました。'); },
+  dlgNo: () => closeConfirm(),
+  dlgYes: () => { const f = pendingConfirm; closeConfirm(); if (f) f(); },
   reset: () => {
-    if (!confirm('入っている予約などをすべて消して、見本のデータに戻しますか?')) return;
-    data = seed(); persist(); ui.attStaff = null; ui.attMonth = null; render(); toast('見本のデータに戻しました。');
+    askConfirm('入っている予約などをすべて消して、見本のデータに戻しますか?', '見本のデータに戻す', () => {
+      data = seed(); persist(); ui.attStaff = null; ui.attMonth = null; render(); toast('見本のデータに戻しました。');
+    });
   },
 };
 
@@ -855,9 +905,11 @@ function toggleWork(ds) {
   const s = staffById(ui.attStaff);
   if (s.workDays.includes(ds)) {
     const n = data.bookings.filter(b => b.status === 'active' && b.staffId === s.id && b.date === ds).length;
-    if (n && !confirm(`この日は ${n} 件のご予約が入っています。お休みにしても、入っているご予約は消えません。お休みにしますか?`)) return;
-    s.workDays = s.workDays.filter(x => x !== ds);
-  } else s.workDays.push(ds);
+    const off = () => { s.workDays = s.workDays.filter(x => x !== ds); persist(); render(); };
+    if (n) return askConfirm(`この日は ${n} 件のご予約が入っています。お休みにしても、入っているご予約は消えません。お休みにしますか?`, 'お休みにする', off);
+    return off();
+  }
+  s.workDays.push(ds);
   persist(); render();
 }
 function saveFormInputs() {
